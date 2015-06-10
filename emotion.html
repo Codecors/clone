@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<!--
+Web page containing BBC version of Geneva Emotion Wheel for capturing
+the emotions felt by someone.
+
+Presents customGEW.svg, and captures interaction
+Up to n (default 3, defined in js file) different emotions can be selected,
+with strengths 1-4.
+
+Andy Brown
+  andy.brown01@bbc.co.uk
+  BBC R&D. May 2015
+
+-->
+<html lang="en">
+
+  <head>
+    <title>Emotion Wheel</title>
+    <meta name="viewport" content="initial-scale=1">
+    <style>
+    .indicator{
+        width:20px;
+        height:20px;
+        display:inline-block;
+        vertical-align:bottom;
+        margin-left:1em;
+        margin-top:2px;
+        border-style: solid;
+        border-width:1px;
+        border-color: #999999;
+        opacity: 0.5;
+    }
+    </style>
+  <head>
+
+  <body>
+    <h2>Select up to <span id='number'>N</span> emotions:</h2>
+    <p>
+        Select an emotion that describes how you feel, then click on the
+        circle that represents how strongly you feel.  You may select up to
+        <span id='number2'>N</span>.
+        To de-select an emotion, click on it again. Once you are happy,
+        press submit.
+    </p>
+    <div class="page-content">
+      <!-- form action='./store.php' method='GET' -->
+      <div><object id="wheel-svg" width="100%" type="image/svg+xml" data="./customGEW.svg"></object></div>
+      <div id="feedback"></div>
+      <p><input type='submit' onclick='store()'/></p>
+      <!-- /form -->
+    </div>
+
+    <script type='text/javascript' src='./gew.js'></script>
+  </body>
+</html>

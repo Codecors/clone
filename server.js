@@ -36,6 +36,9 @@ function handler (req, response) {
         else if(req.url == '/wheel'){
                 loadFile = '/emotion.html';
         }
+        else if(req.url == '/remote' || req.url == '/control'){
+                loadFile = '/control.html';
+        }
         else{
                 loadFile = _url.pathname;
         }
@@ -57,6 +60,15 @@ function handler (req, response) {
 // listen for commands from control page
 io.sockets.on('connection', function (socket) {
 
+    // move to static
+    // pass on requests to all clients
+    socket.on('static', function (data) {
+            console.log("changing page to" + data.url);
+            log("loading static page index: " + data.url);
+            socket.broadcast.emit('static', data);
+        });
+
+    // received data - store
     socket.on('dial', function (data) {
             log("dial data: " + data.time + " - " + data.value);
         });

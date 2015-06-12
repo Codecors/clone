@@ -19,7 +19,11 @@
      var socket = io.connect(server);
      console.log('connected');
      nodejs = true;
- }
+     // allow this page to be changed
+     socket.on('static', function (data) {
+         location.assign(data.url);
+     });
+}
  catch(e){
      // no storage
  }

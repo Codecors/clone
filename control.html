@@ -8,11 +8,13 @@ var server = urlarr[0] + "//" + urlarr[2]
 var socket = io.connect(server);
 
 function moveToWheel(){
-    socket.emit('static', { "url": "/wheel" });
+    var pid = document.getElementById('participantid').value;
+    socket.emit('static', { "url": "/wheel", "pid": pid });
 }
 
 function moveToDial(){
-    socket.emit('static', { "url": "/dial" });
+    var pid = document.getElementById('participantid').value;
+    socket.emit('static', { "url": "/dial", "pid": pid });
 }
 
 </script>
@@ -31,6 +33,8 @@ function moveToDial(){
 
 <h2>Wheel/dial selector</h2>
 <hr>
+<h2>Participant ID</h2>
+<p><input id='participantid' type='text'/></p>
 
 <p><button onclick="moveToWheel()">Wheel</button>
     <button onclick="moveToDial()">Dial</button>

@@ -1,10 +1,28 @@
+/*
+ * Javascript to support dial.html for dial testing
+ *
+ * User moves mouse (or touch?) across screen, to indicate
+ * dislike (left)/like (right).  Feedack using coloured dial;
+ * scores recorded at set intervalsusing nodejs
+ *
+ * Only tested in Chrome
+ *
+ * Andy Brown.
+ * andy.brown01@bbc.co.uk
+ * BBC R&D. June 2015
+ *
+ */
+
+var storeInterval = 1000; // recording interval, in ms
+
+// get the canvas, and specify dial view properties
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 ctx.lineCap = "round";
 ctx.font = "24px arial";
 ctx.lineWidth = 20;
 
-var canvas = document.getElementById("canvas");//$("#canvas");
+var canvas = document.getElementById("canvas");
 // var canvasOffset = canvas.offset();
 var offsetX = canvas.offsetLeft;
 var offsetY = canvas.offsetTop;
@@ -22,9 +40,8 @@ var radius = 100;
 var strokewidth = 25;
 var thumbAngle = PI2 / 30;
 
-var storeInterval = 1000; // recording interval, in ms
-
-// nodejs stuff
+// nodejs initiation
+// will run without, but values only output to console
 var nodejs = false;
 try{
     var urlarr = window.location.href.split("/");
@@ -37,39 +54,36 @@ catch(e){
     // no storage
 }
 
-var recents = [50];
-var percent = 50;
+var recents = [50];  // not used at the moment
+var percent = 50;  // percentage like/dislike
 
 draw();
 store();
 
+/**
+ *  Draw the feedback dial
+ */
 function draw() {
 
     // clear
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // circle
+
+    // colour reflects % satisfaction
     var red = (100-percent)*2.55;
     var green = percent*2.55;
     var blue = (50-Math.abs(50-percent)) * 2.55;
 
     ctx.beginPath();
+    // arc runs f0r 75% of circle, with gap at bottom
     ctx.arc(cx, cy, radius, Math.PI*0.75-(0.5*thumbAngle), (Math.PI*0.25)+(0.5*thumbAngle));
     ctx.strokeStyle = "rgb(" + parseInt(red) + "," + parseInt(green) + "," + parseInt(blue) + ")";
     ctx.lineWidth = strokewidth;
     ctx.stroke();
 
-    // zero marker
-    /* ctx.beginPath();
-    ctx.moveTo(cx, cy + radius - strokewidth / 2);
-    ctx.lineTo(cx, cy + radius + strokewidth / 2);
-    ctx.strokeStyle = "white";
-    ctx.lineWidth = 3;
-    ctx.stroke(); */
-
     // indicator
     ctx.beginPath();
-    // ctx.arc(cx, cy, radius, radianAngle - thumbAngle / 2, radianAngle + thumbAngle / 2);
     var radianAngle = Math.PI*0.75 + percent/100*(PI2*0.75);
     ctx.arc(cx, cy, radius, radianAngle - thumbAngle / 2, radianAngle + thumbAngle / 2);
     ctx.strokeStyle = "gold";
@@ -78,8 +92,6 @@ function draw() {
 
     ctx.fillStyle = "gray";
     ctx.textAlign = "center";
-    // ctx.fillText(parseInt(((radianAngle + PI2) % PI2) / PI2 * 100) + "%", cx, cy + 8);
-    // ctx.fillText(parseInt(((radianAngle - Math.PI/2 + PI2) % PI2) / PI2 * 100) + "%", cx, cy + 8);
     ctx.fillText(parseInt(percent) + "%", cx, cy + 8);
 
 }
@@ -151,11 +163,12 @@ function getMedian(values) {
         return (values[half-1] + values[half]) / 2.0;
 }
 
-
+/**
+ *  Save current value to nodejs server, if using (otherwise report to console)
+ */
 function store(){
-    var median = getMedian(recents);
-    // console.log(recents);
-    // console.log(median, new Date());
+    // var median = getMedian(recents);
+
     var now = new Date();
     console.log(percent, now);
     if(nodejs){

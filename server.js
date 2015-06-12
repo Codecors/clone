@@ -1,3 +1,12 @@
+/*
+ * Nodejs server for handling emotion wheel and dial testing
+ *
+ * Andy Brown.
+ * andy.brown01@bbc.co.uk
+ * BBC R&D. June 2015
+ *
+ */
+
 var app = require('http').createServer(handler)
     , io = require('socket.io').listen(app);
 var fs = require('fs')

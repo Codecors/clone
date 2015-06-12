@@ -11,6 +11,16 @@
  *
  */
 
+// get a GET parameter
+function get(name){
+    if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
+        return decodeURIComponent(name[1]);
+}
+
+// get the uid from the url
+var guid = get('uid');
+// console.log(guid);
+
  /* nodejs - connect to server */
  var nodejs = false;
  try{
@@ -21,7 +31,9 @@
      nodejs = true;
      // allow this page to be changed
      socket.on('static', function (data) {
-         location.assign(data.url);
+         if(data.guid == guid){
+             location.assign(data.url + "?uid=" + guid);
+         }
      });
 }
  catch(e){
@@ -383,7 +395,8 @@ function store(){
             "time": now.toString(),
             "result": resultsString,
             "selection": selection.toString(),
-            "all": allSelected.toString()
+            "all": allSelected.toString(),
+            "guid": guid
         });
     }
     else{

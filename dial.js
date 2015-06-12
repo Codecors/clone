@@ -12,6 +12,13 @@
  * BBC R&D. June 2015
  *
  */
+function get(name){
+    if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
+       return decodeURIComponent(name[1]);
+}
+
+var guid = get('uid');
+// console.log(guid);
 
 var storeInterval = 1000; // recording interval, in ms
 var canvasArea = 500;  // width and height of (square) canvas with feedback wheel
@@ -53,7 +60,9 @@ try{
     nodejs = true;
     // allow this page to be changed
     socket.on('static', function (data) {
-        location.assign(data.url);
+        if(data.guid == guid){
+            location.assign(data.url + "?uid=" + guid);
+        }
     });
 }
 catch(e){
@@ -178,7 +187,7 @@ function store(){
 
     var now = new Date();
     if(nodejs){
-        socket.emit('dial', { "time": now.toString(), "value": percent});
+        socket.emit('dial', { "time": now.toString(), "value": percent, "guid": guid});
     }
     else{
         console.log(percent, now);

@@ -1,0 +1,39 @@
+<html>
+<head>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+var urlarr = window.location.href.split("/");
+var server = urlarr[0] + "//" + urlarr[2]
+var socket = io.connect(server);
+
+function moveToWheel(){
+    socket.emit('static', { "url": "/wheel" });
+}
+
+function moveToDial(){
+    socket.emit('static', { "url": "/dial" });
+}
+
+</script>
+</head>
+
+<style>
+  button{
+  height: 2.5em;
+  width: 10em;
+  margin-right: 2em;
+  font-size: 120%;
+  margin-bottom: 1em;
+  }
+  </style>
+<body>
+
+<h2>Wheel/dial selector</h2>
+<hr>
+
+<p><button onclick="moveToWheel()">Wheel</button>
+    <button onclick="moveToDial()">Dial</button>
+    </p>
+
+</body>

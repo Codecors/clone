@@ -11,10 +11,27 @@
  *
  */
 
+ /* nodejs - connect to server */
+ var nodejs = false;
+ try{
+     var urlarr = window.location.href.split("/");
+     var server = urlarr[0] + "//" + urlarr[2]
+     var socket = io.connect(server);
+     console.log('connected');
+     nodejs = true;
+ }
+ catch(e){
+     // no storage
+ }
+
+
 /* check that the svg wheel is loaded - if so, add listeners, else, wait and try again */
+var checkCount = 0;
 function checkReady() {
-    var svg = document.getElementById("wheel-svg").getSVGDocument();
-    if (svg == null) {
+    var svgElement = document.getElementById("wheel-svg");
+    var svg = svgElement.getSVGDocument();
+    if (svg == null && checkCount < 10) {
+        checkCount++;
         setTimeout("checkReady()", 300);
     } else {
         addFeedbackFields();
@@ -350,17 +367,28 @@ function setFields(){
 /* submit pressed - save selection via xmlhttprequest */
 function store(){
     // generate string
-    var resultsString = new Date();
+    var now = new Date();
+    var resultsString = "";
     for (var i = 0; i < MAX_CHOICES; i++){
         var textField = document.getElementById('emotion' + (i+1));
-        resultsString += "," + textField.value;
+        resultsString += textField.value + ",";
     }
 
-    // send data
-	var xmlhttp = new XMLHttpRequest();
-	xmlhttp.open("POST","./store.php",true);
-	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-	xmlhttp.send("result="+resultsString + "&selection="+selection.toString() + "&all="+allSelected.toString());
+    if(nodejs){
+        socket.emit('wheel', {
+            "time": now.toString(),
+            "result": resultsString,
+            "selection": selection.toString(),
+            "all": allSelected.toString()
+        });
+    }
+    else{
+        // send data
+    	var xmlhttp = new XMLHttpRequest();
+    	xmlhttp.open("POST","./store.php",true);
+    	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    	xmlhttp.send("result="+now+","+resultsString + "&selection="+selection.toString() + "&all="+allSelected.toString());
+    }
 
     // clear wheel
 	clear();

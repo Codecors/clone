@@ -1,0 +1,31 @@
+<!DOCTYPE HTML>
+<!--
+Web page containing BBC version of Geneva Emotion Wheel for capturing
+the emotions felt by someone.
+
+Presents customGEW.svg, and captures interaction
+Up to n (default 3, defined in js file) different emotions can be selected,
+with strengths 1-4.
+
+Andy Brown
+  andy.brown01@bbc.co.uk
+  BBC R&D. May 2015
+
+-->
+<html lang="en">
+
+  <head>
+	<title>Dial testing</title>
+	<meta name="viewport" content="initial-scale=1">
+    <script src="/socket.io/socket.io.js"></script>
+<head>
+
+<body>
+
+
+<h4>Move the mouse on the canvas<br>to change circular slider value.</h4>
+<canvas id="canvas" width=500 height=500></canvas>
+<script type='text/javascript' src='./dial.js'></script>
+
+</body>
+</html>

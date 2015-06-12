@@ -14,12 +14,12 @@
  */
 
 var storeInterval = 1000; // recording interval, in ms
+var canvasArea = 500;  // width and height of (square) canvas with feedback wheel
 
 // get the canvas, and specify dial view properties
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 ctx.lineCap = "round";
-ctx.font = "24px arial";
 ctx.lineWidth = 20;
 
 var canvas = document.getElementById("canvas");
@@ -34,10 +34,12 @@ var startX;
 var startY;
 
 var PI2 = Math.PI * 2;
-var cx = canvas.width/2;
-var cy = canvas.height/2;
-var radius = 100;
-var strokewidth = 25;
+canvas.width = canvasArea;
+canvas.height = canvasArea;
+var cx = canvasArea/2;
+var cy = canvasArea/2;
+var radius = canvas.width/3;
+var strokewidth = radius/3;
 var thumbAngle = PI2 / 30;
 
 // nodejs initiation
@@ -80,7 +82,7 @@ function draw() {
     var blue = (50-Math.abs(50-percent)) * 2.55;
 
     ctx.beginPath();
-    // arc runs f0r 75% of circle, with gap at bottom
+    // arc runs for 75% of circle, with gap at bottom
     ctx.arc(cx, cy, radius, Math.PI*0.75-(0.5*thumbAngle), (Math.PI*0.25)+(0.5*thumbAngle));
     ctx.strokeStyle = "rgb(" + parseInt(red) + "," + parseInt(green) + "," + parseInt(blue) + ")";
     ctx.lineWidth = strokewidth;
@@ -96,7 +98,8 @@ function draw() {
 
     ctx.fillStyle = "gray";
     ctx.textAlign = "center";
-    ctx.fillText(parseInt(percent) + "%", cx, cy + 8);
+    ctx.font = canvasArea/6 + "px arial";
+    ctx.fillText(parseInt(percent) + "%", cx, cy + canvasArea/20);
 
 }
 
@@ -178,7 +181,7 @@ function store(){
         socket.emit('dial', { "time": now.toString(), "value": percent});
     }
     else{
-        console.log(percent, now);        
+        console.log(percent, now);
     }
     recents = [percent];
     window.setTimeout( store, storeInterval);

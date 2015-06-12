@@ -2,7 +2,7 @@
 
 /*
  * Handles post request with two fields, and saves to a file.
- * Goes with emotion wheel stuff
+ * Goes with emotion wheel stuff - used if not running via nodejs
  *
  * Andy Brown.
  * andy.brown01@bbc.co.uk

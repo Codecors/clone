@@ -3,51 +3,38 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
 
+// connect to nodejs server
 var urlarr = window.location.href.split("/");
 var server = urlarr[0] + "//" + urlarr[2]
 var socket = io.connect(server);
-socket.emit('guid', {});
+socket.emit('guid', {});  // request guid
 
-// get a guid
+// got a guid - store it
 var guid = null;
 socket.on('guid', function (data) {
     guid = data.value;
 });
 
+// send pid and guid to server, and go to appropriate page
 function start(destination){
-    var pidbox = document.getElementById('participantid');
-    socket.emit('start', { "url": destination, "pid": pidbox.value, "guid": guid });
+    var pid = document.getElementById('participantid').value;
+    socket.emit('start', { "url": destination, "pid": pid, "guid": guid });
+    location.assign(destination + "?uid=" + guid + "&pid=" + pid);
 }
 
-socket.on('static', function (data) {
-    if(data.guid == guid){
-        location.assign(data.url + "?uid=" + guid);
-    }
-    // location.assign(data.url + "?uid=" + guid);
-});
-
 </script>
+
 <title>Start page</title>
 </head>
-
-<style>
-  button{
-  height: 2.5em;
-  width: 10em;
-  margin-right: 2em;
-  font-size: 120%;
-  margin-bottom: 1em;
-  }
-  </style>
 <body>
-<h2>Participant ID</h2>
-<p><input id='participantid' type='text'/></p>
+    <h2>Participant ID</h2>
+    <p><input id='participantid' type='text'/></p>
 
-<h2>Select whether to start with wheel or dial:</h2>
-<hr>
-
-<p><button onclick="start('/wheel')">Wheel</button>
-    <button onclick="start('/dial')">Dial</button>
+    <h2>Select whether to start with wheel or dial:</h2>
+    <hr>
+    <p>
+        <button onclick="start('/wheel')">Wheel</button>
+        <button onclick="start('/dial')">Dial</button>
     </p>
 
 </body>

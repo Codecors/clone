@@ -16,6 +16,7 @@
  /* ********************************************************* */
  // get guid and pid GET parameters from url
 
+// get a GET parameter
 function get(name){
     if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
        return decodeURIComponent(name[1]);

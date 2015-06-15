@@ -19,6 +19,10 @@ function get(name){
 
 // get the uid from the url
 var guid = get('uid');
+var pid = get('pid');
+if(pid){
+    document.title += " " + pid;
+}
 // console.log(guid);
 
  /* nodejs - connect to server */
@@ -32,7 +36,7 @@ var guid = get('uid');
      // allow this page to be changed
      socket.on('static', function (data) {
          if(data.guid == guid){
-             location.assign(data.url + "?uid=" + guid);
+             location.assign(data.url + "?uid=" + guid + "&pid=" + data.pid);
          }
      });
 }

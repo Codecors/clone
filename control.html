@@ -7,37 +7,58 @@ var urlarr = window.location.href.split("/");
 var server = urlarr[0] + "//" + urlarr[2]
 var socket = io.connect(server);
 
+var registeredParticipants = [];
+
+socket.on('newuser', function (data) {
+    // new user with particpant id = data.pid
+    registeredParticipants.push([data.pid, data.guid]);
+    loadUsers();
+});
+
+//
+function loadUsers(){
+    var select = document.getElementById('participantid');
+    // clear
+    while (select.firstChild) {
+        select.removeChild(select.firstChild);
+    }
+    // add
+    for (var i=0; i<registeredParticipants.length; i++){
+        var opt = document.createElement('option');
+        opt.value = registeredParticipants[i][1];
+        opt.innerHTML = registeredParticipants[i][0];
+        select.appendChild(opt);
+    }
+
+}
+
 function moveToWheel(){
-    var pid = document.getElementById('participantid').value;
-    socket.emit('static', { "url": "/wheel", "pid": pid });
+    var user = document.getElementById('participantid');
+    var guid = user.value;
+    var pid = user.innerHTML;
+    socket.emit('static', { "url": "/wheel", "guid": guid, "pid": pid});
 }
 
 function moveToDial(){
-    var pid = document.getElementById('participantid').value;
-    socket.emit('static', { "url": "/dial", "pid": pid });
+    var user = document.getElementById('participantid');
+    var guid = user.value;
+    var pid = user.innerHTML;
+    socket.emit('static', { "url": "/dial", "guid": guid, "pid": pid });
 }
 
 </script>
 </head>
 
-<style>
-  button{
-  height: 2.5em;
-  width: 10em;
-  margin-right: 2em;
-  font-size: 120%;
-  margin-bottom: 1em;
-  }
-  </style>
 <body>
 
 <h2>Wheel/dial selector</h2>
 <hr>
-<h2>Participant ID</h2>
-<p><input id='participantid' type='text'/></p>
-
-<p><button onclick="moveToWheel()">Wheel</button>
+<p>Participant:
+    <select id='participantid'>
+        <!-- options added dynamically as they register -->
+    </select>
+    <button onclick="moveToWheel()">Wheel</button>
     <button onclick="moveToDial()">Dial</button>
-    </p>
+</p>
 
 </body>

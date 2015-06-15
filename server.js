@@ -14,7 +14,7 @@ var fs = require('fs')
 var path = require('path');
 var url = require("url");
 
-var users = {};
+var users = {};  // list of registered users, with pid and guid
 
 var playingClip = false; // are we playing a proper clip?
 
@@ -24,7 +24,7 @@ console.log("listening");
 var logFile = "./bbc.log";  // path is relative to where the command
                             // node path/server.js is given from
 
-
+// routing function
 function handler (req, response) {
         _url = url.parse(req.url, true);
         // console.log(_url);
@@ -65,7 +65,7 @@ function handler (req, response) {
 // listen for commands from control page
 io.sockets.on('connection', function (socket) {
 
-    // move to static
+    // move to a page
     // pass on requests to all clients
     socket.on('static', function (data) {
             // broadcast change - only those with correct guid will respond
@@ -74,13 +74,15 @@ io.sockets.on('connection', function (socket) {
             socket.broadcast.emit('static', data);
         });
 
-    // guid wanted
+
+    // guid wanted - generate and return
     socket.on('guid', function (data) {
         var guid = generateGuid();
         socket.emit('guid', { "value": guid });
     });
 
-    // start
+
+    // start - new user registered - notify control page
     socket.on('start', function (data) {
         // console.log(data.pid + " is " + data.guid);
         var user = data.guid;
@@ -104,14 +106,14 @@ io.sockets.on('connection', function (socket) {
         });
 
 
-        // log something
-        function log(message){
-            var timestamp = new Date().getTime();
-            var logEntry = timestamp + " " + message + "\n";
-            console.log("log: " + logEntry);
+    // log something
+    function log(message){
+        var timestamp = new Date().getTime();
+        var logEntry = timestamp + " " + message + "\n";
+        console.log("log: " + logEntry);
 
-            var log = fs.createWriteStream(logFile, {'flags': 'a'});
-            log.write(logEntry);
+        var log = fs.createWriteStream(logFile, {'flags': 'a'});
+        log.write(logEntry);
         /*
           // newer version of node.js uses appendFile:
             fs.appendFile("/home/andy/bbc.log", logEntry, function(err) {
@@ -125,7 +127,8 @@ io.sockets.on('connection', function (socket) {
         }
     });
 
-// guid generator
+
+/* guid generator */
 function generateGuid() {
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
         s4() + '-' + s4() + s4() + s4();

@@ -3,19 +3,21 @@
 <script src="/socket.io/socket.io.js"></script>
 <script>
 
+// connect to nodejs server
 var urlarr = window.location.href.split("/");
 var server = urlarr[0] + "//" + urlarr[2]
 var socket = io.connect(server);
 
-var registeredParticipants = [];
+var registeredParticipants = []; // a list of users: [pid, guid]
 
+// listen for messages about newly registered users
 socket.on('newuser', function (data) {
     // new user with particpant id = data.pid
     registeredParticipants.push([data.pid, data.guid]);
     loadUsers();
 });
 
-//
+// populate the list of users using the registeredParticipants array
 function loadUsers(){
     var select = document.getElementById('participantid');
     // clear
@@ -32,18 +34,13 @@ function loadUsers(){
 
 }
 
-function moveToWheel(){
+// ask the server to broadcast a message so this user will change page to given
+// url
+function setUserToPage(url){
     var user = document.getElementById('participantid');
     var guid = user.value;
     var pid = user.innerHTML;
-    socket.emit('static', { "url": "/wheel", "guid": guid, "pid": pid});
-}
-
-function moveToDial(){
-    var user = document.getElementById('participantid');
-    var guid = user.value;
-    var pid = user.innerHTML;
-    socket.emit('static', { "url": "/dial", "guid": guid, "pid": pid });
+    socket.emit('static', { "url": url, "guid": guid, "pid": pid});
 }
 
 </script>
@@ -57,8 +54,8 @@ function moveToDial(){
     <select id='participantid'>
         <!-- options added dynamically as they register -->
     </select>
-    <button onclick="moveToWheel()">Wheel</button>
-    <button onclick="moveToDial()">Dial</button>
+    <button onclick="setUserToPage('/wheel')">Wheel</button>
+    <button onclick="setUserToPage('/dial')">Dial</button>
 </p>
 
 </body>

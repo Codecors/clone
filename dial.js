@@ -18,6 +18,10 @@ function get(name){
 }
 
 var guid = get('uid');
+var pid = get('pid');
+if(pid){
+    document.title += " " + pid;
+}
 // console.log(guid);
 
 var storeInterval = 1000; // recording interval, in ms
@@ -61,7 +65,7 @@ try{
     // allow this page to be changed
     socket.on('static', function (data) {
         if(data.guid == guid){
-            location.assign(data.url + "?uid=" + guid);
+            location.assign(data.url + "?uid=" + guid + "&pid=" + data.pid);
         }
     });
 }

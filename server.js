@@ -68,21 +68,6 @@ io.sockets.on('connection', function (socket) {
     // move to static
     // pass on requests to all clients
     socket.on('static', function (data) {
-            // if there is a pid, find out guid:
-            if(data.pid){
-                var gid = null;
-                for (var key in users) {
-                   if (users.hasOwnProperty(key)) {
-                       var obj = users[key];
-                       if(obj === data.pid){
-                           gid = key;
-                       }
-                    }
-                }
-                console.log(data.pid + " is " + gid );
-                data.guid = gid;
-            }
-
             // broadcast change - only those with correct guid will respond
             console.log("changing page to" + data.url);
             log("loading static page index: " + data.url);
@@ -97,11 +82,11 @@ io.sockets.on('connection', function (socket) {
 
     // start
     socket.on('start', function (data) {
-        console.log(data.pid + " is " + data.guid);
+        // console.log(data.pid + " is " + data.guid);
         var user = data.guid;
         users[user] = data.pid;
-        socket.emit('static', data);
-        console.log(users);
+        socket.broadcast.emit('newuser', data) // tell control page
+        // console.log(users);
     });
 
 

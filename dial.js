@@ -51,13 +51,15 @@ var startX;
 var startY;
 
 var PI2 = Math.PI * 2;
+var faceRadius = 40;
 canvas.width = canvasArea;
-canvas.height = canvasArea;
+canvas.height = canvasArea+50;//(faceRadius*2);
 var cx = canvasArea/2;
 var cy = canvasArea/2;
 var radius = canvas.width/3;
 var strokewidth = radius/3;
 var thumbAngle = PI2 / 30;
+var faceRadius = 40;
 
 // nodejs initiation
 // will run without, but values only output to console
@@ -120,6 +122,29 @@ function draw() {
     ctx.font = canvasArea/6 + "px arial";
     ctx.fillText(parseInt(percent) + "%", cx, cy + canvasArea/20);
 
+    // draw face
+    // function drawFace(context, happy, centerX, centerY, color){
+    drawFace(ctx, true, canvas.width - (faceRadius + 5), canvas.height - (faceRadius + 5), 'rgb(0,255,0)');
+    drawFace(ctx, false, faceRadius+5, canvas.height - (faceRadius + 5), 'rgb(255,0,0)');
+    ctx.save();
+
+    // line
+    ctx.beginPath();
+    ctx.moveTo(faceRadius*3, canvas.height - (faceRadius + 5));
+    ctx.lineTo(canvas.width - (faceRadius*3),canvas.height - (faceRadius + 5));
+    ctx.stroke();
+    // arrowheads
+    var arrlen=20, arrh=10;
+    ctx.moveTo(faceRadius*3-5, canvas.height - (faceRadius + 5));
+    ctx.lineTo(faceRadius*3+arrlen, canvas.height - (faceRadius + 5) + arrh);
+    ctx.lineTo(faceRadius*3+arrlen, canvas.height - (faceRadius + 5) - arrh);
+    ctx.lineTo(faceRadius*3-5, canvas.height - (faceRadius + 5));
+    ctx.fill();
+    ctx.moveTo(canvas.width - faceRadius*3 +5, canvas.height - (faceRadius + 5));
+    ctx.lineTo(canvas.width - faceRadius*3 - arrlen, canvas.height - (faceRadius + 5) + arrh);
+    ctx.lineTo(canvas.width - faceRadius*3 -arrlen, canvas.height - (faceRadius + 5) - arrh);
+    ctx.lineTo(canvas.width - faceRadius*3 +5, canvas.height - (faceRadius + 5));
+    ctx.fill();
 }
 
 
@@ -205,4 +230,40 @@ function store(){
     recents = [percent];
     window.setTimeout( store, storeInterval);
 
+}
+
+/* draw a smileyface */
+function drawFace(context, happy, centerX, centerY, color){
+    var eyeRadius = 6;
+    var eyeXOffset = 15;
+    var eyeYOffset = 10;
+
+    // draw the yellow circle
+    context.beginPath();
+    context.arc(centerX, centerY, faceRadius, 0, 2 * Math.PI, false);
+    context.fillStyle = color;
+    context.fill();
+    context.lineWidth = 3;
+    context.strokeStyle = 'black';
+    context.stroke();
+
+    // draw the eyes
+    context.beginPath();
+    var eyeX = centerX - eyeXOffset;
+    var eyeY = centerY - eyeXOffset;
+    context.arc(eyeX, eyeY, eyeRadius, 0, 2 * Math.PI, false);
+    var eyeX = centerX + eyeXOffset;
+    context.arc(eyeX, eyeY, eyeRadius, 0, 2 * Math.PI, false);
+    context.fillStyle = 'black';
+    context.fill();
+
+    // draw the mouth
+    context.beginPath();
+    if(happy){
+        context.arc(centerX, centerY, faceRadius*0.7, Math.PI*0.1, 0.9*Math.PI, false);
+    }
+    else{
+        context.arc(centerX, centerY+faceRadius*0.7, faceRadius*0.7, Math.PI*1.1, 0-Math.PI*0.1, false);
+    }
+    context.stroke();
 }

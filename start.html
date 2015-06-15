@@ -7,7 +7,9 @@
 var urlarr = window.location.href.split("/");
 var server = urlarr[0] + "//" + urlarr[2]
 var socket = io.connect(server);
-socket.emit('guid', {});  // request guid
+
+// request guid
+socket.emit('guid', {});
 
 // got a guid - store it
 var guid = null;

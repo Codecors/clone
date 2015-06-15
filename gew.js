@@ -11,6 +11,9 @@
  *
  */
 
+/* ********************************************************* */
+// get guid and pid GET parameters from url
+
 // get a GET parameter
 function get(name){
     if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
@@ -23,11 +26,11 @@ var pid = get('pid');
 if(pid){
     document.title += " " + pid;
 }
-// console.log(guid);
+/* ********************************************************* */
 
- /* nodejs - connect to server */
- var nodejs = false;
- try{
+/* nodejs - connect to server */
+var nodejs = false;
+try{
      var urlarr = window.location.href.split("/");
      var server = urlarr[0] + "//" + urlarr[2]
      var socket = io.connect(server);
@@ -40,9 +43,9 @@ if(pid){
          }
      });
 }
- catch(e){
-     // no storage
- }
+catch(e){
+ // no storage
+}
 
 
 /* check that the svg wheel is loaded - if so, add listeners, else, wait and try again */

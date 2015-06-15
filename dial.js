@@ -12,6 +12,10 @@
  * BBC R&D. June 2015
  *
  */
+
+ /* ********************************************************* */
+ // get guid and pid GET parameters from url
+
 function get(name){
     if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
        return decodeURIComponent(name[1]);
@@ -22,7 +26,8 @@ var pid = get('pid');
 if(pid){
     document.title += " " + pid;
 }
-// console.log(guid);
+
+/* ********************************************************* */
 
 var storeInterval = 1000; // recording interval, in ms
 var canvasArea = 500;  // width and height of (square) canvas with feedback wheel

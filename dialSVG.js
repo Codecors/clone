@@ -65,7 +65,7 @@ var recents = [50];  // not used at the moment
 var percent = 50;  // percentage like/dislike
 
 // add listeners and start storage
-setTimeout("setup()", 2000);
+setTimeout("setup()", 500);
 
 
 /**
@@ -89,12 +89,9 @@ function draw(percent) {
 
     // marker position
     var marker = svgDoc.getElementById("marker");
-    var radius = 281;
-    var angle = (percent*2.51) - 215.4; // degrees
-    angle = angle * (Math.PI/180);
-    var dy = Math.sin(angle) * radius;
-    var dx = Math.cos(angle) * radius;
-    var transformAttr = ' translate(' + dx + ',' + dy + ')';
+    var angle = (percent*2.61); // degrees
+    // circle centre is (372,351)
+    var transformAttr = ' rotate(' + angle + ', 372, 351)';
     marker.setAttribute('transform', transformAttr);
 
 }

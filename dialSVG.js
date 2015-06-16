@@ -13,8 +13,8 @@
  *
  */
 
- /* ********************************************************* */
- // get guid and pid GET parameters from url
+/* ********************************************************* */
+// get guid and pid GET parameters from url
 
 // get a GET parameter
 function get(name){
@@ -30,15 +30,15 @@ if(pid){
 
 /* ********************************************************* */
 
-var storeInterval = 400;
+var storeInterval = 400; // time in ms between each save to server
+
+// other variables not really used
 var isDown = false;
 var startX;
 var startY;
 var offsetX = 0; // canvas.offsetLeft;
 var offsetY = 0; // canvas.offsetTop;
 
-var PI2 = Math.PI * 2;
-var faceRadius = 40;
 
 // nodejs initiation
 // will run without, but values only output to console
@@ -96,7 +96,7 @@ function draw(percent) {
 
 }
 
-
+/*
 function handleMouseDown(e) {
     e.preventDefault();
     startX = parseInt(e.clientX - offsetX);
@@ -123,7 +123,9 @@ function handleMouseOut(e) {
     // Put your mouseOut stuff here
     isDown = false;
 }
+*/
 
+// mouse moved
 function handleMouseMove(e) {
     // uncomment if you want to move slider only on drag instead of any mousemove
     //    if (!isDown) { return; }
@@ -140,6 +142,7 @@ function handleMouseMove(e) {
     recents.push(percent)
 }
 
+// touch moved
 function handleTouchMove(e) {
     e.preventDefault();
     var touchobj = e.changedTouches[0] // reference first touch point (ie: first finger)
@@ -148,41 +151,43 @@ function handleTouchMove(e) {
     percent--;
     percent = Math.round(percent);
     if (percent > 100){ percent = 100; }
-    if(percent < 0){ percent = 0; }
+    if (percent < 0){ percent = 0; }
     draw(percent);
     recents.push(percent)
 }
 
 
-/* add listeners for interaction */
+/*
+ * add listeners for interaction
+ * and start sending values to server
+ */
 function setup(){
     var svg = document.getElementById("wheel-svg");
     var canvas = svg.contentDocument;
 
-    // var canvas = document.getElementById('canvas');
-    canvas.onmousedown = function (e) {
+    /* canvas.onmousedown = function (e) {
         // alert('clicked');
         handleMouseDown(e);
     };
     canvas.ontouchstart = function (e) {
         // alert('touched');
         handleMouseDown(e);
-    };
+    }; */
     canvas.onmousemove = function (e) {
         handleMouseMove(e);
     };
     canvas.ontouchmove = function (e) {
         handleTouchMove(e);
     };
-    canvas.onmouseup = function (e) {
+    /* canvas.onmouseup = function (e) {
         handleMouseUp(e);
     };
-    /*canvas.ontouchend = function (e) {
+    canvas.ontouchend = function (e) {
         handleMouseUp(e);
-    };*/
+    };
     canvas.onmouseout = function (e) {
         handleMouseOut(e);
-    };
+    }; */
     draw(50);
     store();
 }

@@ -32,8 +32,22 @@ function handler (req, response) {
         var loadFile =  '';
 		var pathname = __dirname + _url.pathname;
 		var extname = path.extname(pathname);
+        var contentType = 'text/html';
+        switch (extname) {
+			case '.js':
+				contentType = 'text/javascript';
+				break;
+			case '.css':
+				contentType = 'text/css';
+				break;
+			case '.svg':
+			case '.TTF':
+				contentType = 'image/svg+xml';
+				break;
+        }
+
         if(_url.pathname == '/dial'){
-                loadFile = '/dial.html';
+                loadFile = '/dialSVG.html';
         }
         else if(_url.pathname === '/wheel'){
                 loadFile = '/emotion.html';
@@ -57,7 +71,7 @@ function handler (req, response) {
       return response.end('Error loading ' + req.url);
     }
 
-    response.writeHead(200);//, {'Content-Type': contentType});
+    response.writeHead(200, {'Content-Type': contentType});
     response.end(data);
     });
 }
@@ -112,8 +126,13 @@ io.sockets.on('connection', function (socket) {
         var logEntry = timestamp + " " + message + "\n";
         console.log("log: " + logEntry);
 
-        var log = fs.createWriteStream(logFile, {'flags': 'a'});
-        log.write(logEntry);
+        /*try{
+            var log = fs.createWriteStream(logFile, {'flags': 'a'});
+            log.write(logEntry);
+        }
+        catch(e){
+            console.log("failed to write to log file: " + logEntry);
+        }*/
         /*
           // newer version of node.js uses appendFile:
             fs.appendFile("/home/andy/bbc.log", logEntry, function(err) {

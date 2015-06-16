@@ -39,5 +39,9 @@ Visit one of:
 'localhost' can be replaced by IP address or url of hosting machine (accessible
 via ifconfig command on terminal)
 
-the last two (dial or wheel) give a direct view of each tool, but logging
+The last two (dial or wheel) give a direct view of each tool, but logging
 won't include user id - these are best accessed via start page.
+
+
+Data are stored in engagement.log - timestamp and userid differentiate users.
+No coordination with media as yet.

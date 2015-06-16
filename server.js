@@ -32,6 +32,9 @@ function handler (req, response) {
         var loadFile =  '';
 		var pathname = __dirname + _url.pathname;
 		var extname = path.extname(pathname);
+
+        // sort content type (without this, stuff like SVG not handled
+        // properly in browser)
         var contentType = 'text/html';
         switch (extname) {
 			case '.js':
@@ -46,6 +49,7 @@ function handler (req, response) {
 				break;
         }
 
+        // routing
         if(_url.pathname == '/dial'){
                 loadFile = '/dialSVG.html';
         }
@@ -61,19 +65,19 @@ function handler (req, response) {
         else{
                 loadFile = _url.pathname;
         }
-        console.log('reading file ' + loadFile);
-        // fs.readFile(__dirname + '/index.html',
-         fs.readFile(__dirname + loadFile,
-           function (err, data) {
-    if (err) {
-            console.log(err);
-      response.writeHead(500);
-      return response.end('Error loading ' + req.url);
-    }
 
-    response.writeHead(200, {'Content-Type': contentType});
-    response.end(data);
-    });
+        // read file and send response
+        fs.readFile(__dirname + loadFile,
+           function (err, data) {
+                if (err) {
+                    console.log(err);
+                    response.writeHead(500);
+                    return response.end('Error loading ' + req.url);
+                }
+
+                response.writeHead(200, {'Content-Type': contentType});
+                response.end(data);
+            });
 }
 
 // listen for commands from control page

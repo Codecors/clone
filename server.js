@@ -55,7 +55,7 @@ function handler (req, response) {
         else if(_url.pathname == '/remote' || _url.pathname == '/control'){
                 loadFile = '/control.html';
         }
-        else if(_url.pathname === '/start'){
+        else if(_url.pathname === '/start' || _url.pathname === '/'){
                 loadFile = '/start.html';
         }
         else{

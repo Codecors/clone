@@ -21,7 +21,7 @@ var playingClip = false; // are we playing a proper clip?
 app.listen(8002, "0.0.0.0");
 console.log("listening");
 
-var logFile = "./bbc.log";  // path is relative to where the command
+var logFile = "./engagement.log";  // path is relative to where the command
                             // node path/server.js is given from
 
 // routing function
@@ -126,13 +126,13 @@ io.sockets.on('connection', function (socket) {
         var logEntry = timestamp + " " + message + "\n";
         console.log("log: " + logEntry);
 
-        /*try{
+        try{
             var log = fs.createWriteStream(logFile, {'flags': 'a'});
             log.write(logEntry);
         }
         catch(e){
             console.log("failed to write to log file: " + logEntry);
-        }*/
+        }
         /*
           // newer version of node.js uses appendFile:
             fs.appendFile("/home/andy/bbc.log", logEntry, function(err) {

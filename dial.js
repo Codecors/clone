@@ -191,15 +191,36 @@ function handleMouseMove(e) {
     // draw(Math.atan2(mouseY - cy, mouseX - cx));
 }
 
+function handleTouchMove(e) {
+    e.preventDefault();
+    var touchobj = e.changedTouches[0] // reference first touch point (ie: first finger)
+    percent = (touchobj.clientX*100)/(2*cx);
+    percent--;
+    percent = Math.round(percent);
+    if (percent > 100){ percent = 100; }
+    if(percent < 0){ percent = 0; }
+    draw(percent);
+    recents.push(percent)
+}
+
 canvas.onmousedown = function (e) {
+    handleMouseDown(e);
+};
+canvas.ontouchstart = function (e) {
     handleMouseDown(e);
 };
 canvas.onmousemove = function (e) {
     handleMouseMove(e);
 };
+canvas.ontouchmove = function (e) {
+    handleTouchMove(e);
+};
 canvas.onmouseup = function (e) {
     handleMouseUp(e);
 };
+/*canvas.ontouchend = function (e) {
+    handleMouseUp(e);
+};*/
 canvas.onmouseout = function (e) {
     handleMouseOut(e);
 };

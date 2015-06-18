@@ -210,7 +210,7 @@ function store(){
 
     var now = new Date();
     if(nodejs){
-        socket.emit('dial', { "time": now.toString(), "value": percent, "guid": guid});
+        socket.emit('dial', { "time": now.getTime(), "value": percent, "guid": guid});
     }
     else{
         console.log(percent, now);

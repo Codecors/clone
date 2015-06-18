@@ -399,7 +399,7 @@ function store(){
 
     if(nodejs){
         socket.emit('wheel', {
-            "time": now.toString(),
+            "time": now.getTime(),
             "result": resultsString,
             "selection": selection.toString(),
             "all": allSelected.toString(),

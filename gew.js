@@ -38,7 +38,7 @@ try{
      nodejs = true;
      // allow this page to be changed
      socket.on('static', function (data) {
-         if(data.guid == guid){
+         if(data.guid == guid || data.guid === "all"){
              location.assign(data.url + "?uid=" + guid + "&pid=" + data.pid);
          }
      });

@@ -31,6 +31,11 @@ function loadUsers(){
         opt.innerHTML = registeredParticipants[i][0];
         select.appendChild(opt);
     }
+    // all users option:
+    var opt = document.createElement('option');
+    opt.value = "all";
+    opt.innerHTML = "all";
+    select.appendChild(opt);
 
 }
 

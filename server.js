@@ -133,7 +133,7 @@ io.sockets.on('connection', function (socket) {
 
     // syncing event
     socket.on('log', function (data) {
-            log(new Date().getTime() + "session: '" + data.session + "' sync: " + data.event);
+            log(new Date().getTime() + " session: '" + data.session + "' sync: " + data.event);
         });
 
 

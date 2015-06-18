@@ -131,6 +131,11 @@ io.sockets.on('connection', function (socket) {
             socket.emit('static', { "url": "/dial", "guid": data.guid });
         });
 
+    // syncing event
+    socket.on('log', function (data) {
+            log(new Date().getTime() + " sync: " + data.event);
+        });
+
 
     // log something
     function log(message){

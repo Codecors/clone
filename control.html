@@ -48,6 +48,11 @@ function setUserToPage(url){
     socket.emit('static', { "url": url, "guid": guid, "pid": pid});
 }
 
+// send a message to server - for synchronising with media
+function syncEvent(url){
+    var label = document.getElementById('eventLabel');
+    socket.emit('log', { 'event': label.value });
+}
 </script>
 </head>
 
@@ -61,6 +66,11 @@ function setUserToPage(url){
     </select>
     <button onclick="setUserToPage('/wheel')">Wheel</button>
     <button onclick="setUserToPage('/dial')">Dial</button>
+</p>
+
+<p>Log event:
+    <input type='text' id='eventLabel' />
+    <button onclick="syncEvent()">Go</button>
 </p>
 
 </body>

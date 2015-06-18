@@ -51,8 +51,11 @@ function setUserToPage(url){
 // send a message to server - for synchronising with media
 function syncEvent(url){
     var label = document.getElementById('eventLabel');
-    socket.emit('log', { 'event': label.value });
+    socket.emit('log', { 'event': label.value, 'session': session });
 }
+
+var session = prompt("Please enter a session name");
+document.title = "Control panel for " + session + " session";
 </script>
 </head>
 

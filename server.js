@@ -120,13 +120,13 @@ io.sockets.on('connection', function (socket) {
 
     // received data - store
     socket.on('dial', function (data) {
-            var user = users[data.guid];
-            log(user + " dial data: " + data.time + " - " + data.value);
+            var user = users[data.guid] + " " + data.guid;
+            log(user + " " + data.time + " dial: " + data.value);
         });
 
     socket.on('wheel', function (data) {
-        var user = users[data.guid];
-            log(user + " wheel data: " + data.time + " - " + data.result);
+            var user = users[data.guid] + " " + data.guid;
+            log(user + " " + data.time + " wheel: " + data.result);
             // move back to dial
             socket.emit('static', { "url": "/dial", "guid": data.guid });
         });
@@ -135,7 +135,8 @@ io.sockets.on('connection', function (socket) {
     // log something
     function log(message){
         var timestamp = new Date().getTime();
-        var logEntry = timestamp + " " + message + "\n";
+        // var logEntry = timestamp + " " + message + "\n";
+        var logEntry = message + "\n";
         console.log("log: " + logEntry);
 
         try{

@@ -20,7 +20,8 @@ socket.on('guid', function (data) {
 // send pid and guid to server, and go to appropriate page
 function start(destination){
     var pid = document.getElementById('participantid').value;
-    socket.emit('start', { "url": destination, "pid": pid, "guid": guid });
+    var sid = document.getElementById('sessions').value;
+    socket.emit('start', { "url": destination, "pid": pid, "session": sid, "guid": guid });
     location.assign(destination + "?uid=" + guid + "&pid=" + pid);
 }
 
@@ -30,7 +31,10 @@ function start(destination){
 </head>
 <body>
     <h2>Participant ID</h2>
-    <p><input id='participantid' type='text'/></p>
+    <p><select id='sessions'>
+        <!-- options added dynamically -->
+    </select>
+        <input id='participantid' type='text'/></p>
 
     <h2>Select whether to start with wheel or dial:</h2>
     <hr>
@@ -38,5 +42,21 @@ function start(destination){
         <button onclick="start('/wheel')">Wheel</button>
         <button onclick="start('/dial')">Dial</button>
     </p>
+
+<script>
+// request sessions from server
+socket.emit('sessions', {});
+socket.on('sessionlist', function(data){
+    sessions = data.list;
+    var selector = document.getElementById('sessions');
+    for(var i = 0; i < sessions.length; i++){
+        var opt = document.createElement('option');
+        opt.value = sessions[i];
+        opt.innerHTML = sessions[i];
+        selector.appendChild(opt);
+    }
+
+});
+</script>
 
 </body>

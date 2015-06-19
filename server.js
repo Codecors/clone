@@ -14,7 +14,7 @@ var fs = require('fs')
 var path = require('path');
 var url = require("url");
 
-var users = {};  // list of registered users, with pid and guid
+var sessions = [];
 
 var playingClip = false; // are we playing a proper clip?
 
@@ -108,24 +108,60 @@ io.sockets.on('connection', function (socket) {
     });
 
 
+    // session wanted
+    socket.on('getSession', function (data) {
+        var s;
+        for (var i = 0; i < sessions.length; i++){
+            var users = sessions[i].users;
+            for (var j = 0; j < users.length; j++){
+                if(data.guid === users[j].guid){
+                    s = sessions[i].id;
+                }
+
+            }
+        }
+        socket.emit('isSession', { "sid": s });
+    });
+
+    // new session
+    socket.on('newsession', function(data) {
+        var sid = data.sessionid;
+        var sess = new Session(sid);
+        sessions.push(sess);
+        log('new session: ' + sid)
+    });
+
+    // request for list of sessions
+    socket.on('sessions', function(data){
+        var ids = [];
+        for(var i = 0; i< sessions.length; i++){
+            ids.push(sessions[i].id);
+        }
+        socket.emit('sessionlist', {'list': ids});
+    })
+
     // start - new user registered - notify control page
     socket.on('start', function (data) {
         // console.log(data.pid + " is " + data.guid);
-        var user = data.guid;
-        users[user] = data.pid;
-        socket.broadcast.emit('newuser', data) // tell control page
-        // console.log(users);
+        var session = data.session;
+        for (var i = 0; i < sessions.length; i++){
+            if (sessions[i].id === session){
+                var user = new User(data.guid, data.pid);
+                sessions[i].users.push(user);
+            }
+        }
+        socket.broadcast.emit('newuser', data); // tell control page
     });
 
 
     // received data - store
     socket.on('dial', function (data) {
-            var user = users[data.guid] + " " + data.guid;
+            var user = data.pid + " " + data.guid;
             log(user + " " + data.time + " dial: " + data.value);
         });
 
     socket.on('wheel', function (data) {
-            var user = users[data.guid] + " " + data.guid;
+            var user = data.pid + " " + data.guid;
             log(user + " " + data.time + " wheel: " + data.result);
             // move back to dial
             socket.emit('static', { "url": "/dial", "guid": data.guid });
@@ -164,6 +200,15 @@ io.sockets.on('connection', function (socket) {
         }
     });
 
+var Session = function(nid){
+    this.users = [];
+    this.id = nid;
+}
+
+var User = function(guid, pid){
+    this.pid = pid;
+    this.guid = guid;
+}
 
 /* guid generator */
 function generateGuid() {

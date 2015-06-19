@@ -14,22 +14,8 @@
  */
 
 /* ********************************************************* */
-// get guid and pid GET parameters from url
-
-// get a GET parameter
-function get(name){
-    if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
-       return decodeURIComponent(name[1]);
-}
-
-var guid = get('uid');
-var pid = get('pid');
-var session;
-
-if(pid){
-    document.title += " " + pid;
-}
-
+/* variables nodejs, session, pid and guid are collected     */
+/* from nodeInit.js                                          */
 /* ********************************************************* */
 
 var storeInterval = 400; // time in ms between each save to server
@@ -40,35 +26,6 @@ var startX;
 var startY;
 var offsetX = 0; // canvas.offsetLeft;
 var offsetY = 0; // canvas.offsetTop;
-
-
-// nodejs initiation
-// will run without, but values only output to console
-var nodejs = false;
-try{
-    var urlarr = window.location.href.split("/");
-    var server = urlarr[0] + "//" + urlarr[2]
-    var socket = io.connect(server);
-    console.log('connected');
-    nodejs = true;
-
-    // find session:
-    socket.emit('getSession', {"guid": guid});
-    socket.on('isSession', function(data){
-        session = data.sid;
-    })
-
-    // allow this page to be changed
-    socket.on('static', function (data) {
-        if(data.guid == guid || (data.guid === "all" && data.session === session)){
-            location.assign(data.url + "?uid=" + guid + "&pid=" + data.pid);
-        }
-    });
-}
-catch(e){
-    console.log("not saving through nodejs");
-    // no storage
-}
 
 var recents = [50];  // not used at the moment
 var percent = 50;  // percentage like/dislike

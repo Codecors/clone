@@ -1,0 +1,12 @@
+.indicator{
+	width:20px;
+	height:20px;
+	display:inline-block;
+	vertical-align:bottom;
+	margin-left:1em;
+	margin-top:2px;
+	border-style: solid;
+	border-width:1px;
+	border-color: #999999;
+	opacity: 0.5;
+}

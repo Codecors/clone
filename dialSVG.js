@@ -24,6 +24,8 @@ function get(name){
 
 var guid = get('uid');
 var pid = get('pid');
+var session;
+
 if(pid){
     document.title += " " + pid;
 }
@@ -49,9 +51,16 @@ try{
     var socket = io.connect(server);
     console.log('connected');
     nodejs = true;
+
+    // find session:
+    socket.emit('getSession', {"guid": guid});
+    socket.on('isSession', function(data){
+        session = data.sid;
+    })
+
     // allow this page to be changed
     socket.on('static', function (data) {
-        if(data.guid == guid || data.guid === "all"){
+        if(data.guid == guid || (data.guid === "all" && data.session === session)){
             location.assign(data.url + "?uid=" + guid + "&pid=" + data.pid);
         }
     });

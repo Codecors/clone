@@ -91,7 +91,7 @@ function handler (req, response) {
 // listen for commands from control page
 io.sockets.on('connection', function (socket) {
 
-    // move to a page
+    // cnotrol page has asked to change participants to a new page
     // pass on requests to all clients
     socket.on('static', function (data) {
             // broadcast change - only those with correct guid will respond
@@ -108,22 +108,13 @@ io.sockets.on('connection', function (socket) {
     });
 
 
-    // session wanted
+    // session wanted from user
     socket.on('getSession', function (data) {
-        var s;
-        for (var i = 0; i < sessions.length; i++){
-            var users = sessions[i].users;
-            for (var j = 0; j < users.length; j++){
-                if(data.guid === users[j].guid){
-                    s = sessions[i].id;
-                }
-
-            }
-        }
+        var s = getSessionForUser(data.guid);
         socket.emit('isSession', { "sid": s });
     });
 
-    // new session
+    // new session created
     socket.on('newsession', function(data) {
         var sid = data.sessionid;
         var sess = new Session(sid);
@@ -184,7 +175,7 @@ io.sockets.on('connection', function (socket) {
             logstream.write(logEntry);
         }
         catch(e){
-            console.log(e);
+            // console.log(e);
             console.log("failed to write to log file: " + logEntry);
         }
         /*
@@ -200,11 +191,26 @@ io.sockets.on('connection', function (socket) {
         }
     });
 
+// get the session a given user is in
+function getSessionForUser(guid){
+    for (var i = 0; i < sessions.length; i++){
+        var users = sessions[i].users;
+        for (var j = 0; j < users.length; j++){
+            if(guid === users[j].guid){
+                return sessions[i].id;
+            }
+        }
+    }
+    return 0;
+}
+
+// a session - has id and list of users
 var Session = function(nid){
     this.users = [];
     this.id = nid;
 }
 
+// a user - as a human-readable id (pid) and unique guid
 var User = function(guid, pid){
     this.pid = pid;
     this.guid = guid;

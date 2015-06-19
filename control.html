@@ -13,7 +13,9 @@ var registeredParticipants = []; // a list of users: [pid, guid]
 // listen for messages about newly registered users
 socket.on('newuser', function (data) {
     // new user with particpant id = data.pid
-    registeredParticipants.push([data.pid, data.guid]);
+    if(data.session === session){
+        registeredParticipants.push([data.pid, data.guid]);
+    }
     loadUsers();
 });
 
@@ -45,7 +47,10 @@ function setUserToPage(url){
     var user = document.getElementById('participantid');
     var guid = user.value;
     var pid = user.innerHTML;
-    socket.emit('static', { "url": url, "guid": guid, "pid": pid});
+    socket.emit('static', {
+        "url": url, "guid": guid,
+        "pid": pid, "session": session
+        });
 }
 
 // send a message to server - for synchronising with media
@@ -56,7 +61,7 @@ function syncEvent(url){
 
 var session = prompt("Please enter a session name");
 document.title = "Control panel for " + session + " session";
-socket.emit('log', { 'event': 'new session', 'session': session });
+socket.emit('newsession', { 'sessionid': session });
 
 </script>
 </head>

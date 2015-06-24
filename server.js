@@ -92,9 +92,9 @@ function handler (req, response) {
 
 /****** static content - probably want to load these from file ******/
 
-var dialContent = "<div id='canvas' class='page-content'><div width='100%'><object id='wheel-svg' width='100%' type='image/svg+xml' data='./dial.svg'></object></div></div>"; // <script type='text/javascript' src='dialSVG.js'></script>
+var dialContent = "dialContent.html";
 var dialScripts = ['/dialSVG.js'];
-var wheelContent = "<h2>Select up to <span id='number'>N</span> emotions:</h2><p>Select an emotion that describes how you feel, then click on the circle that represents how strongly you feel.  You may select up to <span id='number2'>N</span>. To de-select an emotion, click on it again. Once you are happy, press submit.</p><div class='page-content'><div><object id='wheel-svg' width='100%' type='image/svg+xml' data='./customGEW.svg'></object></div><div id='feedback'></div><p><input type='submit' onclick='storeWheel()'/></p></div>"; //<script type='text/javascript' src='./gew.js'></script>;
+var wheelContent = "wheelContent.html";
 var wheelScripts = ['./gew.js'];
 
 
@@ -222,11 +222,12 @@ io.sockets.on('connection', function (socket) {
     function changeUserView(url, guid, session){
         var data = {};
         if(url === '/dial'){
-            data.content = dialContent;
+            data.content = fs.readFileSync(dialContent,"utf8").toString();
             data.scripts = dialScripts;
             data.title = "Dial testing ";
         }
         else if(url === '/wheel'){
+            data.content = fs.readFileSync(wheelContent,"utf8").toString();
             data.content = wheelContent;
             data.scripts = wheelScripts;
             data.title = "Emotion wheel ";

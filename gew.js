@@ -12,8 +12,7 @@
  */
 
 /* ********************************************************* */
-/* variables nodejs, session, pid and guid are collected     */
-/* from nodeInit.js                                          */
+/* variables nodejs, is collected from nodeInit.js           */
 /* ********************************************************* */
 
 

@@ -14,8 +14,7 @@
  */
 
 /* ********************************************************* */
-/* variables nodejs, session, pid and guid are collected     */
-/* from nodeInit.js                                          */
+/* variables nodejs, is collected from nodeInit.js           */
 /* ********************************************************* */
 
 var storeInterval = 400; // time in ms between each save to server

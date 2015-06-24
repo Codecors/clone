@@ -33,7 +33,6 @@ function checkReady() {
 
 
 var svgDoc;
-checkReady();
 
 
 // wheel contains groups of 4 circles, one group per emotion
@@ -42,8 +41,7 @@ checkReady();
 // X is letter to differentiate emotions
 
 // the letters
-var letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
-	'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't'];
+var letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',	'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't'];
 
 // how many are they allowed to select?
 var MAX_CHOICES = 3;
@@ -59,6 +57,9 @@ var otherLabel = null;
 var selection = [];
 // a list of which circle ids have been selected since last submit
 var allSelected = [];
+
+
+checkReady();
 
 
 /* add some lines to show which emotions have been selected */

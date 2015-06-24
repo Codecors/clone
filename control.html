@@ -19,6 +19,13 @@ socket.on('newuser', function (data) {
     loadUsers();
 });
 
+socket.on('log', function(data){
+    // console.log(data.message);
+    var logger = document.getElementById('logPanel');
+    logger.value += data.message;
+    // and display...
+});
+
 // populate the list of users using the registeredParticipants array
 function loadUsers(){
     var select = document.getElementById('participantid');
@@ -89,6 +96,10 @@ socket.emit('newsession', { 'sessionid': session });
 
 <p>End session:
     <button onclick="end()">End</button>
+</p>
+
+<p>
+    <textarea id='logPanel' ></textarea>
 </p>
 
 </body>

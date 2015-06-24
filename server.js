@@ -114,7 +114,7 @@ io.sockets.on('connection', function (socket) {
         socket.join(sid);
         var sess = new Session(sid);
         sessions.push(sess);
-        log('new session: ' + sid);
+        log('new session: ' + sid, sid);
         // socket.emit('sessionlist', {'list': getSessionList()});
     });
 
@@ -129,7 +129,7 @@ io.sockets.on('connection', function (socket) {
                 sessions.splice(i, 1);
             }
         }
-        log('session end: ' + sid);
+        log('session end: ' + sid, sid);
         // socket.emit('sessionlist', {'list': getSessionList()});
     });
 
@@ -142,7 +142,7 @@ io.sockets.on('connection', function (socket) {
 
     // syncing event across session
     socket.on('log', function (data) {
-            log(new Date().getTime() + " session: '" + data.session + "' sync: " + data.event);
+            log(new Date().getTime() + " session: '" + data.session + "' sync: " + data.event, data.session);
         });
 
 
@@ -183,21 +183,21 @@ io.sockets.on('connection', function (socket) {
     // received data - store
     socket.on('dial', function (data) {
             var user = getPidForUser(socket.id) + " " + socket.id;
-            log(user + " " + data.time + " dial: " + data.value);
+            log(user + " " + data.time + " dial: " + data.value, getSessionForUser(socket.id));
         });
 
     socket.on('wheel', function (data) {
             var user = getPidForUser(socket.id) + " " + socket.id;
             // var user = data.pid + " " + data.guid;
-            log(user + " " + data.time + " wheel: " + data.result);
+            log(user + " " + data.time + " wheel: " + data.result, getSessionForUser(socket.id));
             // move back to dial
             // changeUserView('/dial', socket.id, null);
 
         });
 
 
-    // log something
-    function log(message){
+    // log something - takes a message and a session
+    function log(message, session){
         var timestamp = new Date().getTime();
         // var logEntry = timestamp + " " + message + "\n";
         var logEntry = message;
@@ -210,6 +210,9 @@ io.sockets.on('connection', function (socket) {
         catch(e){
             console.log("failed to write to log file: " + logEntry);
         }
+
+        // send to session pages - control page can display
+        io.to(session).emit('log', {"message": logEntry});
     }
 
 
@@ -257,6 +260,19 @@ function getPidForUser(guid){
         for (var j = 0; j < users.length; j++){
             if(guid === users[j].guid){
                 return users[j].pid;
+            }
+        }
+    }
+    return 0;
+}
+
+// get the session a given user socket id belongs to
+function getSessionForUser(guid){
+    for (var i = 0; i < sessions.length; i++){
+        var users = sessions[i].users;
+        for (var j = 0; j < users.length; j++){
+            if(guid === users[j].guid){
+                return sessions[i].id;
             }
         }
     }

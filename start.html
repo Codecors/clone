@@ -26,6 +26,11 @@ socket.emit('sessions', {});
 socket.on('sessionlist', function(data){
     sessions = data.list;
     var selector = document.getElementById('sessions');
+    // remove current
+    while (selector.firstChild) {
+        selector.removeChild(selector.firstChild);
+    }
+    // add new
     for(var i = 0; i < sessions.length; i++){
         var opt = document.createElement('option');
         opt.value = sessions[i];

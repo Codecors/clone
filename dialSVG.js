@@ -31,7 +31,7 @@ var recents = [50];  // not used at the moment
 var percent = 50;  // percentage like/dislike
 
 // add listeners and start storage
-setTimeout("setup()", 500);
+setTimeout("setup()", 1000);
 
 
 /**
@@ -155,7 +155,8 @@ function setup(){
         handleMouseOut(e);
     }; */
     draw(50);
-    store();
+    stopLogging = false;
+    storeDial();
 }
 
 /* calculate median value of array */
@@ -171,17 +172,17 @@ function getMedian(values) {
 /**
  *  Save current value to nodejs server, if using (otherwise report to console)
  */
-function store(){
+function storeDial(){
     // var median = getMedian(recents);
-
     var now = new Date();
     if(nodejs){
-        socket.emit('dial', { "time": now.getTime(), "value": percent, "guid": guid});
+        socket.emit('dial', { "time": now.getTime(), "value": percent});
     }
     else{
         console.log(percent, now);
     }
     recents = [percent];
-    window.setTimeout( store, storeInterval);
-
+    if(!stopLogging){
+        window.setTimeout( storeDial, storeInterval);
+    }
 }

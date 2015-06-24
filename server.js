@@ -160,7 +160,7 @@ io.sockets.on('connection', function (socket) {
         // console.log(data.pid + " is " + data.guid);
         var session = data.session;
         socket.join(session);
-        console.log(data.pid + " joined room " + session + " - " + socket.id);
+        log(data.pid + " joined session " + session + " - " + socket.id);
         for (var i = 0; i < sessions.length; i++){
             if (sessions[i].id === session){
                 var user = new User(socket.id, data.pid);
@@ -197,8 +197,9 @@ io.sockets.on('connection', function (socket) {
     function log(message){
         var timestamp = new Date().getTime();
         // var logEntry = timestamp + " " + message + "\n";
-        var logEntry = message + "\n";
+        var logEntry = message;
         console.log("log: " + logEntry);
+        logEntry += "\n";
 
         try{
             logstream.write(logEntry);
@@ -213,7 +214,6 @@ io.sockets.on('connection', function (socket) {
 
     // we want to change what the user is seeing
     socket.on('static', function (data) {
-            log("loading static page index: " + data.url);
             changeUserView(data.url, data.guid, data.session);
         });
 
@@ -233,11 +233,11 @@ io.sockets.on('connection', function (socket) {
         }
         if(guid === 'all'){
             // socket.to(session).broadcast.emit('static', data);
-            console.log("broadcasting to all in "+ session);
+            log("setting all users in "+ session + " to view " + url);
             io.to(session).emit('static', data);
         }
         else{
-            console.log("sending message to " + guid);
+            log("setting user " + guid + " to view " + url);
             io.to(guid).emit('static', data);
             // socket.emit('static', data);
         }

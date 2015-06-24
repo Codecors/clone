@@ -357,7 +357,7 @@ function setFields(){
 
 
 /* submit pressed - save selection via xmlhttprequest */
-function store(){
+function storeWheel(){
     // generate string
     var now = new Date();
     var resultsString = "";
@@ -371,8 +371,7 @@ function store(){
             "time": now.getTime(),
             "result": resultsString,
             "selection": selection.toString(),
-            "all": allSelected.toString(),
-            "guid": guid
+            "all": allSelected.toString()
         });
     }
     else{

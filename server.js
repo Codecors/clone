@@ -68,8 +68,11 @@ function handler (req, response) {
         else if(_url.pathname == '/remote' || _url.pathname == '/control'){
                 loadFile = '/control.html';
         }
-        else if(_url.pathname === '/start' || _url.pathname === '/'){
+        else if(_url.pathname === '/start' || _url.pathname === '/register'){
                 loadFile = '/start.html';
+        }
+        else if(_url.pathname === '/'){
+                loadFile = '/index.html';
         }
         else{
                 loadFile = _url.pathname;

@@ -52,6 +52,11 @@ function setUserToPage(url){
     });
 }
 
+// end this session
+function end(){
+    socket.emit('endsession', { 'sessionid': session });
+}
+
 // send a message to server - for synchronising with media
 function syncEvent(url){
     var label = document.getElementById('eventLabel');
@@ -80,6 +85,10 @@ socket.emit('newsession', { 'sessionid': session });
 <p>Log event:
     <input type='text' id='eventLabel' />
     <button onclick="syncEvent()">Go</button>
+</p>
+
+<p>End session:
+    <button onclick="end()">End</button>
 </p>
 
 </body>

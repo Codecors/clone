@@ -46,11 +46,10 @@ function loadUsers(){
 function setUserToPage(url){
     var user = document.getElementById('participantid');
     var guid = user.value;
-    var pid = user.innerHTML;
+
     socket.emit('static', {
-        "url": url, "guid": guid,
-        "pid": pid, "session": session
-        });
+        "url": url, "guid": guid, "session": session
+    });
 }
 
 // send a message to server - for synchronising with media

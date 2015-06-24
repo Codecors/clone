@@ -16,8 +16,6 @@ var url = require("url");
 
 var sessions = [];
 
-var playingClip = false; // are we playing a proper clip?
-
 app.listen(8002, "0.0.0.0");
 console.log("listening");
 
@@ -31,6 +29,9 @@ try{
 catch(e){
     console.log("couldn't create write stream for log");
 }
+
+
+/****** ****** routing ****** ******/
 
 // routing function
 function handler (req, response) {
@@ -88,29 +89,21 @@ function handler (req, response) {
             });
 }
 
+
+/****** static content - probably want to load these from file ******/
+
 var dialContent = "<div id='canvas' class='page-content'><div width='100%'><object id='wheel-svg' width='100%' type='image/svg+xml' data='./dial.svg'></object></div></div>"; // <script type='text/javascript' src='dialSVG.js'></script>
 var dialScripts = ['/dialSVG.js'];
 var wheelContent = "<h2>Select up to <span id='number'>N</span> emotions:</h2><p>Select an emotion that describes how you feel, then click on the circle that represents how strongly you feel.  You may select up to <span id='number2'>N</span>. To de-select an emotion, click on it again. Once you are happy, press submit.</p><div class='page-content'><div><object id='wheel-svg' width='100%' type='image/svg+xml' data='./customGEW.svg'></object></div><div id='feedback'></div><p><input type='submit' onclick='storeWheel()'/></p></div>"; //<script type='text/javascript' src='./gew.js'></script>;
 var wheelScripts = ['./gew.js'];
 
-// listen for commands from control page
+
+/****** ****** message handling ****** ******/
+
 io.sockets.on('connection', function (socket) {
 
-    // control page has asked to change participants to a new page
-    // pass on requests to all clients in same room
-    socket.on('static', function (data) {
-            // broadcast change - only those with correct guid will respond
-            console.log("changing page to " + data.url);
-            log("loading static page index: " + data.url);
-            changeUserView(data.url, data.guid, data.session);
-        });
 
-
-    // session wanted from user
-    socket.on('getSession', function (data) {
-        var s = getSessionForUser(data.guid);
-        socket.emit('isSession', { "sid": s });
-    });
+    /****** session handling ******/
 
     // new session created
     socket.on('newsession', function(data) {
@@ -119,16 +112,48 @@ io.sockets.on('connection', function (socket) {
         var sess = new Session(sid);
         sessions.push(sess);
         log('new session: ' + sid);
+        // socket.emit('sessionlist', {'list': getSessionList()});
     });
+
+
+    // session ended
+    socket.on('endsession', function(data) {
+        var sid = data.sessionid;
+        // remove from session array
+        for(var i = 0; i < sessions.length; i++) {
+            var obj = sessions[i];
+            if(sid.indexOf(obj.id) !== -1) {
+                sessions.splice(i, 1);
+            }
+        }
+        log('session end: ' + sid);
+        // socket.emit('sessionlist', {'list': getSessionList()});
+    });
+
 
     // request for list of sessions
     socket.on('sessions', function(data){
+        socket.emit('sessionlist', {'list': getSessionList()});
+    })
+
+
+    // syncing event across session
+    socket.on('log', function (data) {
+            log(new Date().getTime() + " session: '" + data.session + "' sync: " + data.event);
+        });
+
+
+    // get a list of current session ids
+    function getSessionList(){
         var ids = [];
         for(var i = 0; i< sessions.length; i++){
             ids.push(sessions[i].id);
         }
-        socket.emit('sessionlist', {'list': ids});
-    })
+        return ids;
+    }
+
+
+    /****** new user registration ******/
 
     // start - new user registered - notify control page
     socket.on('start', function (data) {
@@ -150,6 +175,8 @@ io.sockets.on('connection', function (socket) {
     });
 
 
+    /****** results handling ******/
+
     // received data - store
     socket.on('dial', function (data) {
             var user = getPidForUser(socket.id) + " " + socket.id;
@@ -165,11 +192,30 @@ io.sockets.on('connection', function (socket) {
 
         });
 
-    // syncing event
-    socket.on('log', function (data) {
-            log(new Date().getTime() + " session: '" + data.session + "' sync: " + data.event);
-        });
 
+    // log something
+    function log(message){
+        var timestamp = new Date().getTime();
+        // var logEntry = timestamp + " " + message + "\n";
+        var logEntry = message + "\n";
+        console.log("log: " + logEntry);
+
+        try{
+            logstream.write(logEntry);
+        }
+        catch(e){
+            console.log("failed to write to log file: " + logEntry);
+        }
+    }
+
+
+    /****** user view control ******/
+
+    // we want to change what the user is seeing
+    socket.on('static', function (data) {
+            log("loading static page index: " + data.url);
+            changeUserView(data.url, data.guid, data.session);
+        });
 
 
     // set a user's page content
@@ -198,35 +244,8 @@ io.sockets.on('connection', function (socket) {
 
     }
 
-    // log something
-    function log(message){
-        var timestamp = new Date().getTime();
-        // var logEntry = timestamp + " " + message + "\n";
-        var logEntry = message + "\n";
-        console.log("log: " + logEntry);
-
-        try{
-            logstream.write(logEntry);
-        }
-        catch(e){
-            // console.log(e);
-            console.log("failed to write to log file: " + logEntry);
-        }
-    }
 });
 
-// get the session a given user is in
-function getSessionForUser(guid){
-    for (var i = 0; i < sessions.length; i++){
-        var users = sessions[i].users;
-        for (var j = 0; j < users.length; j++){
-            if(guid === users[j].guid){
-                return sessions[i].id;
-            }
-        }
-    }
-    return 0;
-}
 
 // get the pid a given user socket id
 function getPidForUser(guid){

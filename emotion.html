@@ -22,6 +22,7 @@ Andy Brown
   <head>
 
   <body>
+      <div id='content'>
     <h2>Select up to <span id='number'>N</span> emotions:</h2>
     <p>
         Select an emotion that describes how you feel, then click on the
@@ -34,10 +35,11 @@ Andy Brown
       <!-- form action='./store.php' method='GET' -->
       <div><object id="wheel-svg" width="100%" type="image/svg+xml" data="./customGEW.svg"></object></div>
       <div id="feedback"></div>
-      <p><input type='submit' onclick='store()'/></p>
+      <p><input type='submit' onclick='storeWheel()'/></p>
       <!-- /form -->
     </div>
 
     <script type='text/javascript' src='./gew.js'></script>
+</div>
   </body>
 </html>

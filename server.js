@@ -228,7 +228,6 @@ io.sockets.on('connection', function (socket) {
         }
         else if(url === '/wheel'){
             data.content = fs.readFileSync(wheelContent,"utf8").toString();
-            data.content = wheelContent;
             data.scripts = wheelScripts;
             data.title = "Emotion wheel ";
         }

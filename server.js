@@ -88,24 +88,22 @@ function handler (req, response) {
             });
 }
 
+var dialContent = "<div id='canvas' class='page-content'><div width='100%'><object id='wheel-svg' width='100%' type='image/svg+xml' data='./dial.svg'></object></div></div>"; // <script type='text/javascript' src='dialSVG.js'></script>
+var dialScripts = ['/dialSVG.js'];
+var wheelContent = "<h2>Select up to <span id='number'>N</span> emotions:</h2><p>Select an emotion that describes how you feel, then click on the circle that represents how strongly you feel.  You may select up to <span id='number2'>N</span>. To de-select an emotion, click on it again. Once you are happy, press submit.</p><div class='page-content'><div><object id='wheel-svg' width='100%' type='image/svg+xml' data='./customGEW.svg'></object></div><div id='feedback'></div><p><input type='submit' onclick='storeWheel()'/></p></div>"; //<script type='text/javascript' src='./gew.js'></script>;
+var wheelScripts = ['./gew.js'];
+
 // listen for commands from control page
 io.sockets.on('connection', function (socket) {
 
-    // cnotrol page has asked to change participants to a new page
-    // pass on requests to all clients
+    // control page has asked to change participants to a new page
+    // pass on requests to all clients in same room
     socket.on('static', function (data) {
             // broadcast change - only those with correct guid will respond
-            console.log("changing page to" + data.url);
+            console.log("changing page to " + data.url);
             log("loading static page index: " + data.url);
-            socket.broadcast.emit('static', data);
+            changeUserView(data.url, data.guid, data.session);
         });
-
-
-    // guid wanted - generate and return
-    socket.on('guid', function (data) {
-        var guid = generateGuid();
-        socket.emit('guid', { "value": guid });
-    });
 
 
     // session wanted from user
@@ -117,9 +115,10 @@ io.sockets.on('connection', function (socket) {
     // new session created
     socket.on('newsession', function(data) {
         var sid = data.sessionid;
+        socket.join(sid);
         var sess = new Session(sid);
         sessions.push(sess);
-        log('new session: ' + sid)
+        log('new session: ' + sid);
     });
 
     // request for list of sessions
@@ -135,27 +134,35 @@ io.sockets.on('connection', function (socket) {
     socket.on('start', function (data) {
         // console.log(data.pid + " is " + data.guid);
         var session = data.session;
+        socket.join(session);
+        console.log(data.pid + " joined room " + session + " - " + socket.id);
         for (var i = 0; i < sessions.length; i++){
             if (sessions[i].id === session){
-                var user = new User(data.guid, data.pid);
+                var user = new User(socket.id, data.pid);
                 sessions[i].users.push(user);
             }
         }
+        data.guid = socket.id;
         socket.broadcast.emit('newuser', data); // tell control page
+
+        // and set user view as requested
+        changeUserView(data.url, socket.id, data.session);
     });
 
 
     // received data - store
     socket.on('dial', function (data) {
-            var user = data.pid + " " + data.guid;
+            var user = getPidForUser(socket.id) + " " + socket.id;
             log(user + " " + data.time + " dial: " + data.value);
         });
 
     socket.on('wheel', function (data) {
-            var user = data.pid + " " + data.guid;
+            var user = getPidForUser(socket.id) + " " + socket.id;
+            // var user = data.pid + " " + data.guid;
             log(user + " " + data.time + " wheel: " + data.result);
             // move back to dial
-            socket.emit('static', { "url": "/dial", "guid": data.guid });
+            // changeUserView('/dial', socket.id, null);
+
         });
 
     // syncing event
@@ -163,6 +170,33 @@ io.sockets.on('connection', function (socket) {
             log(new Date().getTime() + " session: '" + data.session + "' sync: " + data.event);
         });
 
+
+
+    // set a user's page content
+    function changeUserView(url, guid, session){
+        var data = {};
+        if(url === '/dial'){
+            data.content = dialContent;
+            data.scripts = dialScripts;
+            data.title = "Dial testing ";
+        }
+        else if(url === '/wheel'){
+            data.content = wheelContent;
+            data.scripts = wheelScripts;
+            data.title = "Emotion wheel ";
+        }
+        if(guid === 'all'){
+            // socket.to(session).broadcast.emit('static', data);
+            console.log("broadcasting to all in "+ session);
+            io.to(session).emit('static', data);
+        }
+        else{
+            console.log("sending message to " + guid);
+            io.to(guid).emit('static', data);
+            // socket.emit('static', data);
+        }
+
+    }
 
     // log something
     function log(message){
@@ -178,18 +212,8 @@ io.sockets.on('connection', function (socket) {
             // console.log(e);
             console.log("failed to write to log file: " + logEntry);
         }
-        /*
-          // newer version of node.js uses appendFile:
-            fs.appendFile("/home/andy/bbc.log", logEntry, function(err) {
-                    if(err) {
-                        console.log(err);
-                    } else {
-                        console.log("The file was saved!");
-                    }
-                });
-        */
-        }
-    });
+    }
+});
 
 // get the session a given user is in
 function getSessionForUser(guid){
@@ -198,6 +222,19 @@ function getSessionForUser(guid){
         for (var j = 0; j < users.length; j++){
             if(guid === users[j].guid){
                 return sessions[i].id;
+            }
+        }
+    }
+    return 0;
+}
+
+// get the pid a given user socket id
+function getPidForUser(guid){
+    for (var i = 0; i < sessions.length; i++){
+        var users = sessions[i].users;
+        for (var j = 0; j < users.length; j++){
+            if(guid === users[j].guid){
+                return users[j].pid;
             }
         }
     }
@@ -214,16 +251,4 @@ var Session = function(nid){
 var User = function(guid, pid){
     this.pid = pid;
     this.guid = guid;
-}
-
-/* guid generator */
-function generateGuid() {
-    return s4() + '-' + s4() + '-' + s4() + '-' + s4();
-    // return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-    //     s4() + '-' + s4() + s4() + s4();
-}
-function s4() {
-    return Math.floor((1 + Math.random()) * 0x10000)
-        .toString(16)
-        .substring(1);
 }

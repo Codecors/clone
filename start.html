@@ -1,35 +1,12 @@
 <html>
 <head>
 <script src="/socket.io/socket.io.js"></script>
-<script>
-
-// connect to nodejs server
-var urlarr = window.location.href.split("/");
-var server = urlarr[0] + "//" + urlarr[2]
-var socket = io.connect(server);
-
-// request guid
-socket.emit('guid', {});
-
-// got a guid - store it
-var guid = null;
-socket.on('guid', function (data) {
-    guid = data.value;
-});
-
-// send pid and guid to server, and go to appropriate page
-function start(destination){
-    var pid = document.getElementById('participantid').value;
-    var sid = document.getElementById('sessions').value;
-    socket.emit('start', { "url": destination, "pid": pid, "session": sid, "guid": guid });
-    location.assign(destination + "?uid=" + guid + "&pid=" + pid);
-}
-
-</script>
+<script type='text/javascript' src="nodeInit.js"></script>
 
 <title>Start page</title>
 </head>
 <body>
+    <div id='content'>
     <h2>Participant ID</h2>
     <p><select id='sessions'>
         <!-- options added dynamically -->
@@ -58,5 +35,6 @@ socket.on('sessionlist', function(data){
 
 });
 </script>
+</div>
 
 </body>

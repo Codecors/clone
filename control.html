@@ -126,7 +126,7 @@ function end(){
 function syncEvent(url){
     var label = document.getElementById('eventLabel');
     socket.emit('log', { 'event': label.value, 'session': session });
-    displayFeedback('all', label);
+    displayFeedback('all', 'event: ' + label.value);
 }
 
 var session = prompt("Please enter a session name");

@@ -10,3 +10,16 @@
 	border-color: #999999;
 	opacity: 0.5;
 }
+
+.feedback textarea{
+	width: 30em;
+	height: 6em;
+	padding: 10px;
+}
+
+.feedback {
+	float: left;
+	border: 1px solid gray;
+	padding: 0 10px 10px 10px;
+	margin: 10px 10px 10px 0;
+}

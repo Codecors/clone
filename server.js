@@ -36,8 +36,6 @@ catch(e){
 // routing function
 function handler (req, response) {
         _url = url.parse(req.url, true);
-        // console.log(_url);
-        // console.log(url.parse(req.url, true));
         var loadFile =  '';
 		var pathname = __dirname + _url.pathname;
 		var extname = path.extname(pathname);
@@ -114,7 +112,7 @@ io.sockets.on('connection', function (socket) {
         socket.join(sid);
         var sess = new Session(sid);
         sessions.push(sess);
-        log('new session: ' + sid, sid);
+        log('new session: ' + sid);
         // socket.emit('sessionlist', {'list': getSessionList()});
     });
 
@@ -129,7 +127,7 @@ io.sockets.on('connection', function (socket) {
                 sessions.splice(i, 1);
             }
         }
-        log('session end: ' + sid, sid);
+        log('session end: ' + sid);
         // socket.emit('sessionlist', {'list': getSessionList()});
     });
 
@@ -142,7 +140,7 @@ io.sockets.on('connection', function (socket) {
 
     // syncing event across session
     socket.on('log', function (data) {
-            log(new Date().getTime() + " session: '" + data.session + "' sync: " + data.event, data.session);
+            log(new Date().getTime() + " session: '" + data.session + "' sync: " + data.event);
         });
 
 
@@ -183,13 +181,15 @@ io.sockets.on('connection', function (socket) {
     // received data - store
     socket.on('dial', function (data) {
             var user = getPidForUser(socket.id) + " " + socket.id;
-            log(user + " " + data.time + " dial: " + data.value, getSessionForUser(socket.id));
+            log(user + " " + data.time + " dial: " + data.value);
+            feedback("dial: " + data.value, socket.id);
         });
 
     socket.on('wheel', function (data) {
             var user = getPidForUser(socket.id) + " " + socket.id;
             // var user = data.pid + " " + data.guid;
-            log(user + " " + data.time + " wheel: " + data.result, getSessionForUser(socket.id));
+            log(user + " " + data.time + " wheel: " + data.result);
+            feedback("wheel: " + data.result, socket.id);
             // move back to dial
             // changeUserView('/dial', socket.id, null);
 
@@ -197,7 +197,7 @@ io.sockets.on('connection', function (socket) {
 
 
     // log something - takes a message and a session
-    function log(message, session){
+    function log(message){
         var timestamp = new Date().getTime();
         // var logEntry = timestamp + " " + message + "\n";
         var logEntry = message;
@@ -210,9 +210,15 @@ io.sockets.on('connection', function (socket) {
         catch(e){
             console.log("failed to write to log file: " + logEntry);
         }
+    }
 
+
+    // send feedback to control page
+    function feedback(message, guid){
+        // var pid = getPidForUser(guid);
+        var session = getSessionForUser(guid);
         // send to session pages - control page can display
-        io.to(session).emit('log', {"message": logEntry});
+        io.to(session).emit('feedback', {"message": message, "user": guid});
     }
 
 
@@ -239,11 +245,11 @@ io.sockets.on('connection', function (socket) {
         }
         if(guid === 'all'){
             // socket.to(session).broadcast.emit('static', data);
-            log("setting all users in "+ session + " to view " + url);
+            log("setting all users in "+ session + " to view " + url, null);
             io.to(session).emit('static', data);
         }
         else{
-            log("setting user " + guid + " to view " + url);
+            log("setting user " + guid + " to view " + url, null);
             io.to(guid).emit('static', data);
             // socket.emit('static', data);
         }
@@ -263,7 +269,7 @@ function getPidForUser(guid){
             }
         }
     }
-    return 0;
+    return null;
 }
 
 // get the session a given user socket id belongs to
@@ -276,7 +282,7 @@ function getSessionForUser(guid){
             }
         }
     }
-    return 0;
+    return null;
 }
 
 // a session - has id and list of users

@@ -1,6 +1,7 @@
 <html>
 <head>
 <script src="/socket.io/socket.io.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
 <script>
 
 // connect to nodejs server
@@ -17,14 +18,66 @@ socket.on('newuser', function (data) {
         registeredParticipants.push([data.pid, data.guid]);
     }
     loadUsers();
+    newUser(data.pid, data.guid);
 });
 
-socket.on('log', function(data){
-    // console.log(data.message);
-    var logger = document.getElementById('logPanel');
-    logger.value += data.message;
-    // and display...
+socket.on('feedback', function(data){
+    displayFeedback(data.user, data.message)
 });
+
+// display a message relating to a user
+function displayFeedback(guid, message){
+    if(guid === 'all'){
+        var allFields = document.getElementsByTagName('textarea');
+        for(var i = 0; i < allFields.length; i++){
+            allFields[i].value += "\n";
+            allFields[i].value += message;
+            allFields[i].scrollTop = allFields[i].scrollHeight;
+        }
+    }
+    else{
+        var userField = document.getElementById('feedback-'+guid);
+        userField.value += "\n";
+        userField.value += message;
+        userField.scrollTop = userField.scrollHeight;
+    }
+}
+
+// a new user has registered
+function newUser(pid, guid){
+    var feedbackPane = document.getElementById('feedback');
+    var newUserPanel = document.createElement('div');
+    newUserPanel.className = 'feedback';
+    // title
+    var title = document.createElement('h3');
+    var tc = document.createTextNode(pid);
+    title.appendChild(tc);
+    newUserPanel.appendChild(title);
+    // controls
+    var controls = document.createElement('p');
+    controls.appendChild(getNewPageButton('wheel', '/wheel', guid));
+    controls.appendChild(getNewPageButton('dial', '/dial', guid));
+    newUserPanel.appendChild(controls);
+    // feedback
+    var panel = document.createElement('textarea');
+    panel.id = 'feedback-' + guid;
+    newUserPanel.appendChild(panel);
+    feedbackPane.appendChild(newUserPanel);
+}
+
+function getNewPageButton(label, url, guid){
+    var wheelBtn = document.createElement('button');
+    wheelBtn.appendChild(document.createTextNode(label));
+    wheelBtn.onclick = (function() {
+        // var currentI = i;
+        return function() {
+            // onClickLink(currentI + '');
+            sendUserChangeMessage(url, guid);
+            displayFeedback(guid, 'set page to ' + label);
+        }
+     })();
+     return wheelBtn;
+}
 
 // populate the list of users using the registeredParticipants array
 function loadUsers(){
@@ -53,7 +106,12 @@ function loadUsers(){
 function setUserToPage(url){
     var user = document.getElementById('participantid');
     var guid = user.value;
+    sendUserChangeMessage(url, guid);
+    displayFeedback(guid, 'setting to ' + url);
+}
 
+
+function sendUserChangeMessage(url, guid){
     socket.emit('static', {
         "url": url, "guid": guid, "session": session
     });
@@ -68,6 +126,7 @@ function end(){
 function syncEvent(url){
     var label = document.getElementById('eventLabel');
     socket.emit('log', { 'event': label.value, 'session': session });
+    displayFeedback('all', label);
 }
 
 var session = prompt("Please enter a session name");
@@ -98,8 +157,12 @@ socket.emit('newsession', { 'sessionid': session });
     <button onclick="end()">End</button>
 </p>
 
-<p>
-    <textarea id='logPanel' ></textarea>
-</p>
+<!-- div class='feedback'>
+    <h3>All results</h3>
+    <textarea id='logPanel'></textarea>
+</div -->
+
+<div id='feedback'>
+</div>
 
 </body>

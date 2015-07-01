@@ -1,0 +1,80 @@
+*{
+    font-size: 20px;
+}
+
+h1{ font-size: 150%; }
+h2{ font-size: 125%;
+    margin-bottom: 0.5em;}
+
+.indicator{
+	width:10%;
+	height:25px;
+	display:inline-block;
+	vertical-align:bottom;
+	margin-left:1em;
+	margin-top:2px;
+	border-style: solid;
+	border-width:1px;
+	border-color: #999999;
+	opacity: 0.5;
+}
+
+.feedback textarea{
+    font-size: 75%;
+	width: 100%;
+	height: 6em;
+	padding: 10px;
+    margin-top:0.5em;
+}
+
+.feedback {
+	border: 1px solid gray;
+	padding: 0 10px 10px 10px;
+	margin: 1% 1% 1% 0;
+}
+
+.fbline{
+    margin-bottom: 20px;
+
+}
+
+input[type=text], input[type=url], input[type=email], input[type=password], input[type=tel] {
+  -webkit-appearance: none; -moz-appearance: none;
+  display: block;
+  margin: 0;
+  width: 100%;
+  height: 2em;
+}
+button, select{
+ -webkit-appearance: none; -moz-appearance: none;
+ display: block;
+ margin: 0.5em 0;
+ font-size: 1em; line-height: 2.5em;
+ color: #333;
+ font-weight: bold;
+ height: 2.5em; width: 100%;
+ background: #fdfdfd; background: -moz-linear-gradient(top, #fdfdfd 0%, #bebebe 100%); background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fdfdfd), color-stop(100%,#bebebe)); background: -webkit-linear-gradient(top, #fdfdfd 0%,#bebebe 100%); background: -o-linear-gradient(top, #fdfdfd 0%,#bebebe 100%); background: -ms-linear-gradient(top, #fdfdfd 0%,#bebebe 100%); background: linear-gradient(to bottom, #fdfdfd 0%,#bebebe 100%);
+ border: 1px solid #bbb;
+ -webkit-border-radius: 10px; -moz-border-radius: 10px; border-radius: 10px;
+}
+
+.fbline input{
+    width: 50%;
+    display: inline;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.half{
+    -webkit-appearance: none; -moz-appearance: none;
+    display: inline;
+    margin: 0 2% 0 0;
+    font-size: 1em; line-height: 2.5em;
+    color: #333;
+    font-weight: bold;
+    height: 2.5em; width: 45%;
+    background: #fdfdfd; background: -moz-linear-gradient(top, #fdfdfd 0%, #bebebe 100%); background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#fdfdfd), color-stop(100%,#bebebe)); background: -webkit-linear-gradient(top, #fdfdfd 0%,#bebebe 100%); background: -o-linear-gradient(top, #fdfdfd 0%,#bebebe 100%); background: -ms-linear-gradient(top, #fdfdfd 0%,#bebebe 100%); background: linear-gradient(to bottom, #fdfdfd 0%,#bebebe 100%);
+    border: 1px solid #bbb;
+    -webkit-border-radius: 10px; -moz-border-radius: 10px; border-radius: 10px;
+
+}

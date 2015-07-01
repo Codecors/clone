@@ -1,7 +1,9 @@
 <html>
 <head>
 <script src="/socket.io/socket.io.js"></script>
-<link rel="stylesheet" type="text/css" href="style.css">
+<link rel="stylesheet" media="screen and (max-width: 1000px)" type="text/css" href="style-m.css">
+<link rel="stylesheet" media="screen and (min-device-width: 1001px)" href="style.css" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <script>
 
 // connect to nodejs server
@@ -49,12 +51,12 @@ function newUser(pid, guid){
     var newUserPanel = document.createElement('div');
     newUserPanel.className = 'feedback';
     // title
-    var title = document.createElement('h3');
+    var title = document.createElement('h2');
     var tc = document.createTextNode(pid);
     title.appendChild(tc);
     newUserPanel.appendChild(title);
     // controls
-    var controls = document.createElement('p');
+    var controls = document.createElement('div');
     controls.appendChild(getNewPageButton('wheel', '/wheel', guid));
     controls.appendChild(getNewPageButton('dial', '/dial', guid));
     newUserPanel.appendChild(controls);
@@ -68,6 +70,7 @@ function newUser(pid, guid){
 function getNewPageButton(label, url, guid){
     var wheelBtn = document.createElement('button');
     wheelBtn.appendChild(document.createTextNode(label));
+    wheelBtn.className = 'half';
     wheelBtn.onclick = (function() {
         // var currentI = i;
         return function() {
@@ -139,30 +142,37 @@ socket.emit('newsession', { 'sessionid': session });
 <body>
 
 <h2>Wheel/dial selector</h2>
-<hr>
-<p>Participant:
+<div>
     <select id='participantid'>
         <!-- options added dynamically as they register -->
     </select>
-    <button onclick="setUserToPage('/wheel')">Wheel</button>
-    <button onclick="setUserToPage('/dial')">Dial</button>
-</p>
+<div>
+    <button class='half' onclick="setUserToPage('/wheel')">Wheel</button>
+    <button class='half' onclick="setUserToPage('/dial')">Dial</button>
+</div>
+</div>
 
-<p>Log event:
+<hr>
+<h2>Log event:</h2>
+<div>
     <input type='text' id='eventLabel' />
     <button onclick="syncEvent()">Go</button>
-</p>
+</div>
 
-<p>End session:
-    <button onclick="end()">End</button>
-</p>
+<hr>
+<h2>End session:</h2>
+<div>
+    <button onclick="end()">End session</button>
+</div>
 
 <!-- div class='feedback'>
     <h3>All results</h3>
     <textarea id='logPanel'></textarea>
 </div -->
 
+<hr>
 <div id='feedback'>
+    <h2>Participant data:</h2>
 </div>
 
 </body>

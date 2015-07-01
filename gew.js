@@ -73,6 +73,7 @@ function addFeedbackFields(){
     var feedbackDiv = document.getElementById("feedback");
     for (var i = 0; i < MAX_CHOICES; i++){
             var fbEmo = document.createElement("div");
+            fbEmo.className = 'fbline';
             var lab = document.createTextNode("Emotion " + (i+1) + ": ");
             fbEmo.appendChild(lab);
             var display = document.createElement("input");

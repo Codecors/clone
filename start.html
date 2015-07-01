@@ -1,20 +1,25 @@
 <html>
 <head>
+<link rel="stylesheet" media="screen and (max-width: 1000px)" type="text/css" href="style-m.css">
+<link rel="stylesheet" media="screen and (min-device-width: 1001px)" href="style.css" />
 <script src="/socket.io/socket.io.js"></script>
 <script type='text/javascript' src="nodeInit.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <title>Start page</title>
 </head>
 <body>
+    <div class='container'>
     <div id='content'>
-    <h2>Participant ID</h2>
+    <h2>Select session</h2>
     <p><select id='sessions'>
         <!-- options added dynamically -->
     </select>
-        <input id='participantid' type='text'/></p>
+    <h2>Specify Participant ID</h2>
+        <p><input id='participantid' type='text'/></p>
+        <hr>
 
     <h2>Select whether to start with wheel or dial:</h2>
-    <hr>
     <p>
         <button onclick="start('/wheel')">Wheel</button>
         <button onclick="start('/dial')">Dial</button>
@@ -42,4 +47,5 @@ socket.on('sessionlist', function(data){
 </script>
 </div>
 
+</div>
 </body>

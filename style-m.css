@@ -6,6 +6,10 @@ h1{ font-size: 150%; }
 h2{ font-size: 125%;
     margin-bottom: 0.5em;}
 
+li{
+    padding-bottom: 1em;
+}
+
 .indicator{
 	width:10%;
 	height:25px;

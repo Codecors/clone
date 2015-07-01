@@ -16,18 +16,15 @@
 /* ********************************************************* */
 
 
-/* check that the svg wheel is loaded - if so, add listeners, else, wait and try again */
-var checkCount = 0;
+/* add listeners when wheel loaded */
 function checkReady() {
+
     var svgElement = document.getElementById("wheel-svg");
-    var svg = svgElement.getSVGDocument();
-    if (svg == null && checkCount < 10) {
-        checkCount++;
-        setTimeout("checkReady()", 300);
-    } else {
+    svgElement.addEventListener('load', function()
+    {
         addFeedbackFields();
 		addCircleListeners();
-    }
+    });
 }
 
 

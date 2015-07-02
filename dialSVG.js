@@ -77,7 +77,7 @@ function draw(percent) {
         var marker = svgDoc.getElementById("marker");
         var angle = (percent*2.61); // degrees
         // circle centre is (372,351)
-        var transformAttr = ' rotate(' + angle + ', 372, 351)';
+        var transformAttr = ' rotate(' + angle + ', 371, 228)';
         marker.setAttribute('transform', transformAttr);
     }
     catch(e){

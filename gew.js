@@ -16,17 +16,23 @@
 /* ********************************************************* */
 
 
-/* add listeners when wheel loaded */
+/* setup when wheel loaded */
 function checkReady() {
 
     var svgElement = document.getElementById("wheel-svg");
     svgElement.addEventListener('load', function()
     {
-        addFeedbackFields();
-		addCircleListeners();
+        start();
     });
+
+    setTimeout(start, 3000);  // double check it's worked...
 }
 
+/* add feedback fields and event listeners */
+function start(){
+    addFeedbackFields();
+	addCircleListeners();
+}
 
 var svgDoc;
 
@@ -60,6 +66,11 @@ checkReady();
 
 /* add some lines to show which emotions have been selected */
 function addFeedbackFields(){
+    var fb1 = document.getElementById("emotion1");
+    if(fb1 !== null){
+        return;
+    }
+
     // First set intructions to reflect number of choices
     var instruct1 = document.getElementById("number");
     instruct1.innerHTML = MAX_CHOICES;

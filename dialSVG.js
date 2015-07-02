@@ -18,6 +18,7 @@
 /* ********************************************************* */
 
 var storeInterval = 400; // time in ms between each save to server
+var stopLogging= true;
 
 // other variables not really used
 var isDown = false;
@@ -28,9 +29,27 @@ var offsetY = 0; // canvas.offsetTop;
 
 var recents = [50];  // not used at the moment
 var percent = 50;  // percentage like/dislike
+var started = false;
 
-// add listeners and start storage
-setTimeout("setup()", 1000);
+// add listeners and start storage when dial loaded
+function start(){
+    var svgElement = document.getElementById("wheel-svg");
+    svgElement.addEventListener('load', function()
+    {
+         setup();
+    });
+    // sometimes this doesn't work...
+    setTimeout(doublecheck, 3000);
+}
+
+start();
+
+// retry the starting actions
+function doublecheck(){
+    if(!started){
+        setup();
+    }
+};
 
 
 /**
@@ -38,27 +57,34 @@ setTimeout("setup()", 1000);
  *  Set colour, % value text, and marker position
  */
 function draw(percent) {
-    var svg = document.getElementById("wheel-svg");
-    var svgDoc = svg.contentDocument;
+    try{
+        started = true;
+        var svg = document.getElementById("wheel-svg");
+        var svgDoc = svg.contentDocument;
 
-    // colour
-    var dial = svgDoc.getElementById("dial");
-    var red = (100-percent)*2.55;
-    var green = percent*2.55;
-    var blue = (50-Math.abs(50-percent)) * 2.55;
-    dial.style.fill = "rgb(" + parseInt(red) + "," + parseInt(green) + "," + parseInt(blue) + ")";;
+        // colour
+        var dial = svgDoc.getElementById("dial");
+        var red = (100-percent)*2.55;
+        var green = percent*2.55;
+        var blue = (50-Math.abs(50-percent)) * 2.55;
+        dial.style.fill = "rgb(" + parseInt(red) + "," + parseInt(green) + "," + parseInt(blue) + ")";;
 
-    // text feedback
-    var number = svgDoc.getElementById("percent");
-    number.textContent = percent + "%";
+        // text feedback
+        var number = svgDoc.getElementById("percent");
+        number.textContent = percent + "%";
 
-    // marker position
-    var marker = svgDoc.getElementById("marker");
-    var angle = (percent*2.61); // degrees
-    // circle centre is (372,351)
-    var transformAttr = ' rotate(' + angle + ', 372, 351)';
-    marker.setAttribute('transform', transformAttr);
-
+        // marker position
+        var marker = svgDoc.getElementById("marker");
+        var angle = (percent*2.61); // degrees
+        // circle centre is (372,351)
+        var transformAttr = ' rotate(' + angle + ', 372, 351)';
+        marker.setAttribute('transform', transformAttr);
+    }
+    catch(e){
+        // probably not loaded - try setup again
+        started = false;
+        setup();
+    }
 }
 
 /*

@@ -1,6 +1,7 @@
-var qfile = 'questions';
+var qfile = 'questions'; // json file with questions in
 var xmlhttp = new XMLHttpRequest();
-var questions = [];
+var questions = []; // stores question ids
+var scaleMax = 7; // number of items on likert scale
 
 xmlhttp.onreadystatechange = function() {
     if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
@@ -27,7 +28,7 @@ function showQuestion(q){
     likertList.appendChild(likLab1);
     questions.push(q.id);
 
-    for (var i = 0; i < 7; i++){
+    for (var i = 0; i < scaleMax; i++){
         var likertItem = document.createElement('li');
         var radio = document.createElement('input');
         radio.type = "radio";
@@ -58,7 +59,7 @@ function storeData(){
 
     // find out which were selected
     for (var i = 0; i < questions.length; i++){
-        for (var j = 0; j < 7; j++){
+        for (var j = 0; j < scaleMax; j++){
             var radioId = qfile + questions[i] + '-' + j;
             var radioEl = document.getElementById(radioId);
             if (radioEl.checked){

@@ -59,6 +59,7 @@ function newUser(pid, guid){
     var controls = document.createElement('div');
     controls.appendChild(getNewPageButton('wheel', '/wheel', guid));
     controls.appendChild(getNewPageButton('dial', '/dial', guid));
+    controls.appendChild(getNewPageButton('questions', '/questions', guid));
     newUserPanel.appendChild(controls);
     // feedback
     var panel = document.createElement('textarea');
@@ -149,6 +150,7 @@ socket.emit('newsession', { 'sessionid': session });
 <div>
     <button class='half' onclick="setUserToPage('/wheel')">Wheel</button>
     <button class='half' onclick="setUserToPage('/dial')">Dial</button>
+    <button class='half' onclick="setUserToPage('/questions')">Dial</button>
 </div>
 </div>
 

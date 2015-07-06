@@ -97,6 +97,8 @@ var dialContent = "dialContent.html";
 var dialScripts = ['/dialSVG.js'];
 var wheelContent = "wheelContent.html";
 var wheelScripts = ['./gew.js'];
+var questionContent = "likert.html";
+var questionScripts = ['./likert.js'];
 
 
 /****** ****** message handling ****** ******/
@@ -195,6 +197,16 @@ io.sockets.on('connection', function (socket) {
 
         });
 
+    socket.on('questions', function (data) {
+            var user = getPidForUser(socket.id) + " " + socket.id;
+            // var user = data.pid + " " + data.guid;
+            log(user + " " + data.time + " questions: " + data.selection);
+            feedback("questions: " + data.selection, socket.id);
+            // move back to dial
+            // changeUserView('/dial', socket.id, null);
+
+        });
+
 
     // log something - takes a message and a session
     function log(message){
@@ -242,6 +254,11 @@ io.sockets.on('connection', function (socket) {
             data.content = fs.readFileSync(wheelContent,"utf8").toString();
             data.scripts = wheelScripts;
             data.title = "Emotion wheel ";
+        }
+        else if(url === '/questions'){
+            data.content = fs.readFileSync(questionContent,"utf8").toString();
+            data.scripts = questionScripts;
+            data.title = "Questionnaire ";
         }
         if(guid === 'all'){
             // socket.to(session).broadcast.emit('static', data);

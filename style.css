@@ -23,3 +23,8 @@
 	padding: 0 10px 10px 10px;
 	margin: 10px 10px 10px 0;
 }
+
+.likert li{
+	display: inline;
+    list-style-type: none;
+}

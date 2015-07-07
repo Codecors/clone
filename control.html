@@ -88,6 +88,7 @@ function newUser(pid, guid){
     feedbackPane.appendChild(newUserPanel);
 }
 
+// create a button for displaying to the user to a set view
 function getNewPageButton(label, url, guid){
     var wheelBtn = document.createElement('button');
     wheelBtn.appendChild(document.createTextNode(label));
@@ -153,8 +154,74 @@ function syncEvent(url){
     displayFeedback('all', 'event: ' + label.value);
 }
 
-// get s=? from url
+socket.emit('sessions', {});
+socket.on('sessionlist', function(data){
+	sessions = data.list;
+	var select = document.getElementById('sessionid');
+	var selected = get('s');
+	// add new
+	for(var i = 0; i < sessions.length; i++){
+		var opt = document.createElement('option');
+        opt.value = sessions[i];
+        opt.innerHTML = sessions[i];
+        select.appendChild(opt);
+		if(selected === sessions[i]){
+			opt.selected = true;
+			var newField = document.getElementById('newName');
+			newField.hidden = true;
+		}
+	}
+});
+
+function toggleNew(){
+	var newName = document.getElementById('newOption');
+	var newField = document.getElementById('newName');
+	if(newName.selected){
+		newField.hidden = false;
+	}
+	else{
+		newField.hidden = true;
+	}
+}
+
+socket.on('authenticated', function(data){
+    if(data.failed){
+        var pwdField = document.getElementById('pwd')
+        pwdField.focus();
+        pwdField.select();
+    }
+    else{
+        entrance.hidden = true;
+        socket.emit('getusers', {'session': data.session });
+    }
+});
+
+// go to control page
+// either create new, or link to current
 var session;
+function go(){
+	// if new selected - go
+	var newOption = document.getElementById('newOption');
+	var newName = document.getElementById('session');
+	var pwd = document.getElementById('pwd');
+	if(newOption.selected){
+        session = newName.value;
+		var data = {'sessionid': session, 'password': pwd.value };
+		socket.emit('newsession', data);
+		// go
+		entrance.hidden = true;
+	}
+	else{
+		// alert('checking password');
+		var e = document.getElementById("sessionid");
+		session = e.options[e.selectedIndex].value;
+        socket.emit('testpwd', {'session': session, 'pwd': pwd.value })
+	}
+    document.title = "Control panel for " + session + " session";
+}
+
+// get s=? from url
+/*var session;
 session = get('s');
 if (session == null){
     // if not
@@ -174,11 +241,26 @@ else{
     socket.emit('getusers', {'session': session });
 }
 document.title = "Control panel for " + session + " session";
-
+*/
 </script>
 </head>
 
 <body>
+    <div id='entrance' class='entrance'>
+		<div>
+		    <select id='sessionid'  onChange="toggleNew()">
+				<option value='new' id='newOption'>New session</option>
+		        <!-- options added dynamically as they register -->
+		    </select>
+			<span id='newName'><label for='session'>Name:</label><input type='text' name='session' id='session' value=''/></span>
+			<label for='pwd'>Password:</label><input type='password' name='pwd' id='pwd'/>
+		</div>
+
+		<div>
+			<button onclick='go()'>Go</button>
+			<!-- input type='submit' name='old' value='Go' / -->
+		</div>
+	</div>
 
 <h2>Wheel/dial selector</h2>
 <div>

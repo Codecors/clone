@@ -159,9 +159,17 @@ session = get('s');
 if (session == null){
     // if not
     var session = prompt("Please enter a session name");
-    socket.emit('newsession', { 'sessionid': session });
+    if(session == null){
+        // return to index page
+        location.assign('/');
+    }
+    else{
+        // ask to set password
+        socket.emit('newsession', { 'sessionid': session });
+    }
 }
 else{
+    // test against password...
     // load controls for all users:
     socket.emit('getusers', {'session': session });
 }

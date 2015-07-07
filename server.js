@@ -51,6 +51,9 @@ function handler (req, response) {
 			case '.css':
 				contentType = 'text/css';
 				break;
+            case '.log':
+				contentType = 'text/plain';
+				break;
 			case '.svg':
 			case '.TTF':
 				contentType = 'image/svg+xml';

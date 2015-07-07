@@ -38,7 +38,7 @@
         for(var i = 0; i < sessions.length; i++){
             var sli = document.createElement('li');
             var slink = document.createElement('a');
-            slink.href = '/new?s=' + sessions[i];
+            slink.href = '/remote?s=' + sessions[i];
             slink.appendChild(document.createTextNode(sessions[i]));
             sli.appendChild(slink);
             list.appendChild(sli);
@@ -55,7 +55,7 @@
         possible, with each participant registered to a single session.
     </p>
     <ul>
-        <li><a href='/new'>Start a new session controller</a></li>
+        <li><a href='/remote'>Start a new session controller</a></li>
         <li><a href='/register'>Register a new participant</a></li>
     </ul>
 

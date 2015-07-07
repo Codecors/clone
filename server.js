@@ -67,6 +67,9 @@ function handler (req, response) {
         else if(_url.pathname === '/wheel'){
                 loadFile = '/emotion.html';
         }
+        else if(_url.pathname === '/new'){
+                loadFile = '/newSession.html';
+        }
         else if(_url.pathname == '/remote' || _url.pathname == '/control'){
                 loadFile = '/control.html';
         }

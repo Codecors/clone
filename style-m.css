@@ -84,6 +84,23 @@ button, select{
 }
 
 .likert li{
-    display: inline;
+    display: table-cell;
     list-style-type: none;
+    margin: 0;
+    border-bottom: 1px solid black;
+}
+
+#questionlist{
+    padding: 0;
+    list-style: none;
+}
+
+#questionlist li{
+    margin-bottom: 1em;
+}
+
+.likert{
+    display: table;
+    width:100%;
+    padding: 1em 0 0 0;
 }

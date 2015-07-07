@@ -23,9 +23,29 @@ socket.on('newuser', function (data) {
     newUser(data.pid, data.guid);
 });
 
+// load list of current users
+socket.on('userlist', function (data){
+    // do nothing if we already have participants...
+    if(registeredParticipants.length > 0){
+        return;
+    }
+    var list = data.list;
+    for (var i = 0; i<list.length; i++){
+        registeredParticipants.push([list[i].pid, list[i].guid]);
+        newUser(list[i].pid, list[i].guid);
+    }
+    loadUsers();
+});
+
 socket.on('feedback', function(data){
     displayFeedback(data.user, data.message)
 });
+
+// retrieve a GET parameter
+function get(name){
+   if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
+      return decodeURIComponent(name[1]);
+}
 
 // display a message relating to a user
 function displayFeedback(guid, message){
@@ -133,9 +153,19 @@ function syncEvent(url){
     displayFeedback('all', 'event: ' + label.value);
 }
 
-var session = prompt("Please enter a session name");
+// get s=? from url
+var session;
+session = get('s');
+if (session == null){
+    // if not
+    var session = prompt("Please enter a session name");
+    socket.emit('newsession', { 'sessionid': session });
+}
+else{
+    // load controls for all users:
+    socket.emit('getusers', {'session': session });
+}
 document.title = "Control panel for " + session + " session";
-socket.emit('newsession', { 'sessionid': session });
 
 </script>
 </head>
@@ -150,7 +180,7 @@ socket.emit('newsession', { 'sessionid': session });
 <div>
     <button class='half' onclick="setUserToPage('/wheel')">Wheel</button>
     <button class='half' onclick="setUserToPage('/dial')">Dial</button>
-    <button class='half' onclick="setUserToPage('/questions')">Dial</button>
+    <button class='half' onclick="setUserToPage('/questions')">Questions</button>
 </div>
 </div>
 

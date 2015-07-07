@@ -23,7 +23,7 @@ console.log("listening");
 
 // set up logging
 // path is relative to where the command node path/server.js is given from
-var logFile = "./engagement.log";
+var logFile = "./logs/engagement.log";
 try{
     var logstream = fs.createWriteStream(logFile, {'flags': 'a'});
 }
@@ -117,7 +117,7 @@ io.sockets.on('connection', function (socket) {
         // socket.emit('sessionlist', {'list': getSessionList()});
         var now = new Date();
         var today = now.getHours() + "-" + now.getDate() + now.getMonth() + now.getFullYear();
-        var logFileName = today + "-log" + sid + ".log";
+        var logFileName = "logs/" + today + "-log" + sid + ".log";
         try{
             sessionlogstream = fs.createWriteStream(logFileName, {'flags': 'a'});
             console.log("created " + logFileName);

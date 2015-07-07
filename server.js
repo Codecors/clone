@@ -132,6 +132,7 @@ io.sockets.on('connection', function (socket) {
             console.log("couldn't create write stream for log " + logFileName);
         }
         var sess = new Session(sid, sessionlogstream);
+        sess.password = data.password;
         sessions.push(sess);
         log('new session: ' + sid, sid);
     });
@@ -152,6 +153,18 @@ io.sockets.on('connection', function (socket) {
         // socket.emit('sessionlist', {'list': getSessionList()});
     });
 
+    // test a password for a session
+    socket.on('testpwd', function(data){
+        var pwd = data.pwd;
+        var s = getSessionById(data.session);
+        if(pwd === s.password){
+            io.to(socket.id).emit('authenticated', data);
+        }
+        else{
+            io.to(socket.id).emit('authenticated',  {"failed": true});
+        }
+        // socket.emit('authenticated', data);
+    });
 
     // request for list of sessions
     socket.on('sessions', function(data){
@@ -372,6 +385,7 @@ var Session = function(nid, logfilestream){
     this.users = [];
     this.id = nid;
     this.logstream = logfilestream;
+    this.password = "";
 }
 
 // a user - as a human-readable id (pid) and unique guid

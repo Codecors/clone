@@ -1,0 +1,90 @@
+<html>
+<head>
+<script src="/socket.io/socket.io.js"></script>
+<link rel="stylesheet" media="screen and (max-width: 1000px)" type="text/css" href="style-m.css">
+<link rel="stylesheet" media="screen and (min-device-width: 1001px)" href="style.css" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>
+
+// connect to nodejs server
+var urlarr = window.location.href.split("/");
+var server = urlarr[0] + "//" + urlarr[2]
+var socket = io.connect(server);
+
+// retrieve a GET parameter
+function get(name){
+   if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
+      return decodeURIComponent(name[1]);
+}
+
+
+socket.emit('sessions', {});
+socket.on('sessionlist', function(data){
+	sessions = data.list;
+	var select = document.getElementById('sessionid');
+	var selected = get('s');
+	// add new
+	for(var i = 0; i < sessions.length; i++){
+		var opt = document.createElement('option');
+        opt.value = sessions[i];
+        opt.innerHTML = sessions[i];
+        select.appendChild(opt);
+		if(selected === sessions[i]){
+			opt.selected = true;
+			var newField = document.getElementById('newName');
+			newField.hidden = true;
+		}
+	}
+});
+
+function toggleNew(){
+	var newName = document.getElementById('newOption');
+	var newField = document.getElementById('newName');
+	if(newName.selected){
+		newField.hidden = false;
+	}
+	else{
+		newField.hidden = true;
+	}
+}
+
+// go to control page
+// either create new, or link to current
+function go(){
+	// if new selected - go
+	var newOption = document.getElementById('newOption');
+	var newName = document.getElementById('session');
+	var pwd = document.getElementById('pwd');
+	if(newOption.selected){
+		var data = {'sessionid': newName.value, 'password': pwd.value };
+		socket.emit('newsession', data);
+		// go
+		location.assign('/remote?s=' + newName.value)
+	}
+	else{
+		// alert('checking password');
+		var e = document.getElementById("sessionid");
+		var selsess = e.options[e.selectedIndex].value;
+		location.assign('/remote?s=' + selsess)
+	}
+}
+</script>
+</head>
+
+<body>
+	<!-- form action='control.html' method='POST' -->
+	<div>
+	    <select id='sessionid'  onChange="toggleNew()">
+			<option value='new' id='newOption'>New session</option>
+	        <!-- options added dynamically as they register -->
+	    </select>
+		<span id='newName'><label for='session'>Name:</label><input type='text' name='session' id='session' value=''/></span>
+		<label for='pwd'>Password:</label><input type='password' name='pwd' id='pwd'/>
+	<div>
+
+		<div>
+			<button onclick='go()'>Go</button>
+			<!-- input type='submit' name='old' value='Go' / -->
+		</div>
+	<!-- /form -->
+</body>

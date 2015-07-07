@@ -15,6 +15,7 @@ var path = require('path');
 var url = require("url");
 
 var sessions = [];
+var oldSessions = [];
 
 app.listen(3000, "0.0.0.0");
 console.log("listening");
@@ -111,11 +112,22 @@ io.sockets.on('connection', function (socket) {
     // new session created
     socket.on('newsession', function(data) {
         var sid = data.sessionid;
+        var sessionlogstream = null;
         socket.join(sid);
-        var sess = new Session(sid);
-        sessions.push(sess);
-        log('new session: ' + sid);
         // socket.emit('sessionlist', {'list': getSessionList()});
+        var now = new Date();
+        var today = now.getHours() + "-" + now.getDate() + now.getMonth() + now.getFullYear();
+        var logFileName = today + "-log" + sid + ".log";
+        try{
+            sessionlogstream = fs.createWriteStream(logFileName, {'flags': 'a'});
+            console.log("created " + logFileName);
+        }
+        catch(e){
+            console.log("couldn't create write stream for log " + logFileName);
+        }
+        var sess = new Session(sid, sessionlogstream);
+        sessions.push(sess);
+        log('new session: ' + sid, sid);
     });
 
 
@@ -126,10 +138,11 @@ io.sockets.on('connection', function (socket) {
         for(var i = 0; i < sessions.length; i++) {
             var obj = sessions[i];
             if(sid.indexOf(obj.id) !== -1) {
+                oldSessions.push(sessions[i]);
                 sessions.splice(i, 1);
             }
         }
-        log('session end: ' + sid);
+        log('session end: ' + sid, sid);
         // socket.emit('sessionlist', {'list': getSessionList()});
     });
 
@@ -142,7 +155,7 @@ io.sockets.on('connection', function (socket) {
 
     // syncing event across session
     socket.on('log', function (data) {
-            log(new Date().getTime() + " session: '" + data.session + "' sync: " + data.event);
+            log(new Date().getTime() + " session: '" + data.session + "' sync: " + data.event, data.session);
         });
 
 
@@ -163,7 +176,7 @@ io.sockets.on('connection', function (socket) {
         // console.log(data.pid + " is " + data.guid);
         var session = data.session;
         socket.join(session);
-        log(data.pid + " joined session " + session + " - " + socket.id);
+        log(data.pid + " joined session " + session + " - " + socket.id, session);
         for (var i = 0; i < sessions.length; i++){
             if (sessions[i].id === session){
                 var user = new User(socket.id, data.pid);
@@ -183,14 +196,16 @@ io.sockets.on('connection', function (socket) {
     // received data - store
     socket.on('dial', function (data) {
             var user = getPidForUser(socket.id) + " " + socket.id;
-            log(user + " " + data.time + " dial: " + data.value);
+            var session = getSessionForUser(socket.id);
+            log(user + " " + data.time + " dial: " + data.value, session);
             feedback("dial: " + data.value, socket.id);
         });
 
     socket.on('wheel', function (data) {
             var user = getPidForUser(socket.id) + " " + socket.id;
+            var session = getSessionForUser(socket.id);
             // var user = data.pid + " " + data.guid;
-            log(user + " " + data.time + " wheel: " + data.result);
+            log(user + " " + data.time + " wheel: " + data.result, session);
             feedback("wheel: " + data.result, socket.id);
             // move back to dial
             // changeUserView('/dial', socket.id, null);
@@ -199,8 +214,9 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('questions', function (data) {
             var user = getPidForUser(socket.id) + " " + socket.id;
+            var session = getSessionForUser(socket.id);
             // var user = data.pid + " " + data.guid;
-            log(user + " " + data.time + " questions: " + data.selection);
+            log(user + " " + data.time + " questions: " + data.selection, session);
             feedback("questions: " + data.selection, socket.id);
             // move back to dial
             // changeUserView('/dial', socket.id, null);
@@ -209,18 +225,24 @@ io.sockets.on('connection', function (socket) {
 
 
     // log something - takes a message and a session
-    function log(message){
+    function log(message, sessionid){
         var timestamp = new Date().getTime();
         // var logEntry = timestamp + " " + message + "\n";
         var logEntry = message;
         console.log("log: " + logEntry);
         logEntry += "\n";
-
-        try{
-            logstream.write(logEntry);
+        var session = getSessionById(sessionid);
+        if(session == null){
+            console.log(sessionid + " ended");
         }
-        catch(e){
-            console.log("failed to write to log file: " + logEntry);
+        else{
+            try{
+                logstream.write(logEntry);
+                session.logstream.write(logEntry);
+            }
+            catch(e){
+                console.log("failed to write to log file: " + logEntry);
+            }
         }
     }
 
@@ -262,11 +284,11 @@ io.sockets.on('connection', function (socket) {
         }
         if(guid === 'all'){
             // socket.to(session).broadcast.emit('static', data);
-            log("setting all users in "+ session + " to view " + url, null);
+            log("setting all users in "+ session + " to view " + url, session);
             io.to(session).emit('static', data);
         }
         else{
-            log("setting user " + guid + " to view " + url, null);
+            log("setting user " + guid + " to view " + url, session);
             io.to(guid).emit('static', data);
             // socket.emit('static', data);
         }
@@ -289,7 +311,7 @@ function getPidForUser(guid){
     return null;
 }
 
-// get the session a given user socket id belongs to
+// get the session id a given user socket id belongs to
 function getSessionForUser(guid){
     for (var i = 0; i < sessions.length; i++){
         var users = sessions[i].users;
@@ -302,10 +324,21 @@ function getSessionForUser(guid){
     return null;
 }
 
+// get the session obect with given id
+function getSessionById(sessionid){
+    for (var i = 0; i < sessions.length; i++){
+        if(sessionid === sessions[i].id){
+            return sessions[i];
+        }
+    }
+    return null;
+}
+
 // a session - has id and list of users
-var Session = function(nid){
+var Session = function(nid, logfilestream){
     this.users = [];
     this.id = nid;
+    this.logstream = logfilestream;
 }
 
 // a user - as a human-readable id (pid) and unique guid

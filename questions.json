@@ -1,0 +1,17 @@
+[
+{
+"id": 1,
+"question": "While I was reading the narrative, I could easily picture the events in it taking place.",
+"type": "likert"
+},
+{
+"id": 2,
+"question": "While I was reading the narrative, activity going on in the room around me was on my mind.",
+"type": "likert"
+},
+{
+"id": 3,
+"question": "I wanted to learn how the narrative ended.",
+"type": "likert"
+}
+]

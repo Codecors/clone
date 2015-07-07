@@ -11,7 +11,11 @@ xmlhttp.onreadystatechange = function() {
 }
 
 // write questions
-function writeQuestions(qdata) {
+function writeQuestions(data) {
+    var title = data.title;
+    var t = document.getElementById('title');
+    t.innerHTML = title;
+    var qdata = data.questions;
     for(var i = 0; i < qdata.length; i++) {
 		showQuestion(qdata[i]);
     }
@@ -64,6 +68,7 @@ function storeData(){
             var radioEl = document.getElementById(radioId);
             if (radioEl.checked){
                 selection.push(radioId);
+                radioEl.checked = false;
             }
         }
     }

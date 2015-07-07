@@ -4,6 +4,47 @@
     <link rel="stylesheet" media="screen and (max-width: 1000px)" type="text/css" href="style-m.css">
     <link rel="stylesheet" media="screen and (min-device-width: 1001px)" href="style.css" />
     <title>Start page</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+    // nodejs initiation
+    var urlarr = window.location.href.split("/");
+    var server = urlarr[0] + "//" + urlarr[2]
+    var socket = io.connect(server);
+    console.log('connected');
+    var nodejs = true;
+
+    // request sessions from server
+    socket.emit('oldsessions', {});
+    socket.on('oldSessionlist', function(data){
+        sessions = data.list;
+        var list = document.getElementById('oldsessions');
+        // add new
+        for(var i = 0; i < sessions.length; i++){
+            var sli = document.createElement('li');
+            var slink = document.createElement('a');
+            slink.href = sessions[i].logFile;
+            slink.appendChild(document.createTextNode(sessions[i].id));
+            sli.appendChild(slink);
+            list.appendChild(sli);
+        }
+
+    });
+
+    socket.emit('sessions', {});
+    socket.on('sessionlist', function(data){
+        sessions = data.list;
+        var list = document.getElementById('currentsessions');
+        // add new
+        for(var i = 0; i < sessions.length; i++){
+            var sli = document.createElement('li');
+            var slink = document.createElement('a');
+            slink.href = '/remote?s=' + sessions[i];
+            slink.appendChild(document.createTextNode(sessions[i]));
+            sli.appendChild(slink);
+            list.appendChild(sli);
+        }
+    });
+    </script>
 </head>
 <body>
     <div id='content'>
@@ -17,6 +58,14 @@
         <li><a href='/remote'>Start a new session controller</a></li>
         <li><a href='/register'>Register a new participant</a></li>
     </ul>
+
+<h2>Running sessions</h2>
+<ul id='currentsessions'>
+</ul>
+
+<h2>Old session data</h2>
+<ul id='oldsessions'>
+</ul>
 
 </div>
 

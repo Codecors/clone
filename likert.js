@@ -24,7 +24,7 @@ function showQuestion(q){
     var likertList = document.createElement('ul');
     likertList.className = 'likert';
     var likLab1 = document.createElement('li');
-    likLab1.appendChild(document.createTextNode("Strongly Agree"));
+    likLab1.appendChild(document.createTextNode("Agree"));
     likertList.appendChild(likLab1);
     questions.push(q.id);
 
@@ -39,7 +39,7 @@ function showQuestion(q){
         likertList.appendChild(likertItem);
     }
     var likLab2 = document.createElement('li');
-    likLab2.appendChild(document.createTextNode("Strongly Disagree"));
+    likLab2.appendChild(document.createTextNode("Disagree"));
     likertList.appendChild(likLab2);
 
     item.appendChild(question);

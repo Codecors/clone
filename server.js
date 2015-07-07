@@ -152,6 +152,11 @@ io.sockets.on('connection', function (socket) {
         socket.emit('sessionlist', {'list': getSessionList()});
     })
 
+    // request for list of sessions
+    socket.on('oldsessions', function(data){
+        socket.emit('oldSessionlist', {'list': getOldSessionsJson()});
+    })
+
 
     // syncing event across session
     socket.on('log', function (data) {
@@ -168,6 +173,15 @@ io.sockets.on('connection', function (socket) {
         return ids;
     }
 
+    // get json list of old sessions
+    function getOldSessionsJson(){
+        var ses = [];
+        for(var i=0; i<oldSessions.length; i++){
+            var s = oldSessions[i];
+            ses.push({"id": s.id, "logFile": s.logstream.path});
+        }
+        return ses;
+    }
 
     /****** new user registration ******/
 
@@ -184,12 +198,25 @@ io.sockets.on('connection', function (socket) {
             }
         }
         data.guid = socket.id;
-        socket.broadcast.emit('newuser', data); // tell control page
+        io.to(data.session).emit('newuser', data); // tell control page
 
         // and set user view as requested
         changeUserView(data.url, socket.id, data.session);
     });
 
+    // request for a list of all users in a session
+    socket.on('getusers', function (data){
+        var session = getSessionById(data.session);
+        var users = [];
+        for (var i = 0; i<session.users.length; i++){
+            var u = session.users[i];
+            users.push({"pid": u.pid, "guid": u.guid});
+        }
+        socket.join(data.session);
+        console.log(users);
+        io.to(data.session).emit('userlist', {"list": users}); // tell control page
+
+    });
 
     /****** results handling ******/
 

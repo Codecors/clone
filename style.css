@@ -1,4 +1,4 @@
-#entrance{
+.entrance{
     position: fixed;
     padding: 5%;
     top: 0;
@@ -11,6 +11,21 @@
     // background: url(data:;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAABl0RVh0U29mdHdhcmUAUGFpbnQuTkVUIHYzLjUuNUmK/OAAAAATSURBVBhXY2RgYNgHxGAAYuwDAA78AjwwRoQYAAAAAElFTkSuQmCC) repeat scroll transparent\9; /* ie fallback png background image */
     z-index:9999;
     color:white;
+	display: block;
+}
+
+.entrance span{
+	// padding-top: 1em;
+	display: block;
+	width: 15em;
+}
+
+.entrance input{
+	float: right;
+	padding-left: auto;
+}
+.entrance select{
+	width: 100%;
 }
 
 .indicator{

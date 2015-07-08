@@ -4,6 +4,7 @@
 <link rel="stylesheet" media="screen and (max-width: 1000px)" type="text/css" href="style-m.css">
 <link rel="stylesheet" media="screen and (min-device-width: 1001px)" href="style.css" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" media="only screen and (min-device-width: 768px) and (max-device-width: 1024px)" href="style.css" />
 <script>
 
 // connect to nodejs server
@@ -168,7 +169,7 @@ socket.on('sessionlist', function(data){
 		if(selected === sessions[i]){
 			opt.selected = true;
 			var newField = document.getElementById('newName');
-			newField.hidden = true;
+			newField.style.display = "none";
 		}
 	}
 });
@@ -177,10 +178,10 @@ function toggleNew(){
 	var newName = document.getElementById('newOption');
 	var newField = document.getElementById('newName');
 	if(newName.selected){
-		newField.hidden = false;
+        newField.style.display = "block";
 	}
 	else{
-		newField.hidden = true;
+        newField.style.display = "none";
 	}
 }
 
@@ -191,7 +192,8 @@ socket.on('authenticated', function(data){
         pwdField.select();
     }
     else{
-        entrance.hidden = true;
+        var entrance = document.getElementById('entrance');
+        entrance.style.visibility = "hidden";
         socket.emit('getusers', {'session': data.session });
     }
 });
@@ -209,7 +211,8 @@ function go(){
 		var data = {'sessionid': session, 'password': pwd.value };
 		socket.emit('newsession', data);
 		// go
-		entrance.hidden = true;
+        var entrance = document.getElementById('entrance');
+        entrance.style.visibility = "hidden";
 	}
 	else{
 		// alert('checking password');
@@ -220,45 +223,25 @@ function go(){
     document.title = "Control panel for " + session + " session";
 }
 
-// get s=? from url
-/*var session;
-session = get('s');
-if (session == null){
-    // if not
-    var session = prompt("Please enter a session name");
-    if(session == null){
-        // return to index page
-        location.assign('/');
-    }
-    else{
-        // ask to set password
-        socket.emit('newsession', { 'sessionid': session });
-    }
-}
-else{
-    // test against password...
-    // load controls for all users:
-    socket.emit('getusers', {'session': session });
-}
-document.title = "Control panel for " + session + " session";
-*/
 </script>
 </head>
 
 <body>
     <div id='entrance' class='entrance'>
 		<div>
-		    <select id='sessionid'  onChange="toggleNew()">
+		    <span><select id='sessionid'  onChange="toggleNew()">
 				<option value='new' id='newOption'>New session</option>
 		        <!-- options added dynamically as they register -->
-		    </select>
+		    </select></span>
+            <br/>
 			<span id='newName'><label for='session'>Name:</label><input type='text' name='session' id='session' value=''/></span>
-			<label for='pwd'>Password:</label><input type='password' name='pwd' id='pwd'/>
+            <br/>
+            <span><label for='pwd'>Password:</label><input type='password' name='pwd' id='pwd'/></span>
+            <br/>
 		</div>
 
 		<div>
-			<button onclick='go()'>Go</button>
-			<!-- input type='submit' name='old' value='Go' / -->
+			<span><button onclick='go()'>Go</button></span>
 		</div>
 	</div>
 

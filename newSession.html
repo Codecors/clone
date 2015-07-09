@@ -59,13 +59,13 @@ function go(){
 		var data = {'sessionid': newName.value, 'password': pwd.value };
 		socket.emit('newsession', data);
 		// go
-		location.assign('/remote?s=' + newName.value)
+		location.assign('/remote?s=' + newName.value);
 	}
 	else{
 		// alert('checking password');
 		var e = document.getElementById("sessionid");
 		var selsess = e.options[e.selectedIndex].value;
-		location.assign('/remote?s=' + selsess)
+		location.assign('/remote?s=' + selsess);
 	}
 }
 </script>
@@ -73,18 +73,20 @@ function go(){
 
 <body>
 	<!-- form action='control.html' method='POST' -->
-	<div>
-	    <select id='sessionid'  onChange="toggleNew()">
-			<option value='new' id='newOption'>New session</option>
-	        <!-- options added dynamically as they register -->
-	    </select>
-		<span id='newName'><label for='session'>Name:</label><input type='text' name='session' id='session' value=''/></span>
-		<label for='pwd'>Password:</label><input type='password' name='pwd' id='pwd'/>
-	<div>
+	<div id='entrance'>
+		<div>
+		    <select id='sessionid'  onChange="toggleNew()">
+				<option value='new' id='newOption'>New session</option>
+		        <!-- options added dynamically as they register -->
+		    </select>
+			<span id='newName'><label for='session'>Name:</label><input type='text' name='session' id='session' value=''/></span>
+			<label for='pwd'>Password:</label><input type='password' name='pwd' id='pwd'/>
+		<div>
 
 		<div>
 			<button onclick='go()'>Go</button>
 			<!-- input type='submit' name='old' value='Go' / -->
 		</div>
+	</div>
 	<!-- /form -->
 </body>

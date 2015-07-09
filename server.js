@@ -123,7 +123,7 @@ io.sockets.on('connection', function (socket) {
         // socket.emit('sessionlist', {'list': getSessionList()});
         var now = new Date();
         var today = now.getHours() + "-" + now.getDate() + now.getMonth() + now.getFullYear();
-        var logFileName = "logs/" + today + "-log" + sid + ".log";
+        var logFileName = "logs/" + today + "-log" + sid.replace(/\s+/g, '') + ".log";
         try{
             sessionlogstream = fs.createWriteStream(logFileName, {'flags': 'a'});
             console.log("created " + logFileName);
@@ -237,14 +237,20 @@ io.sockets.on('connection', function (socket) {
 
     });
 
+    socket.on('joinSession', function (data){
+        socket.join(data.session);
+    })
+
     /****** results handling ******/
 
     // received data - store
     socket.on('dial', function (data) {
-            var user = getPidForUser(socket.id) + " " + socket.id;
+            var pid = getPidForUser(socket.id);
+            var user = pid + " " + socket.id;
             var session = getSessionForUser(socket.id);
             log(user + " " + data.time + " dial: " + data.value, session);
             feedback("dial: " + data.value, socket.id);
+            io.to(session).emit('dialUpdate', {"pid": pid, "value": data.value });
         });
 
     socket.on('wheel', function (data) {

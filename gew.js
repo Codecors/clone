@@ -379,7 +379,7 @@ function storeWheel(){
         socket.emit('wheel', {
             "time": now.getTime(),
             "result": resultsString,
-            "selection": selection.toString(),
+            "selection": selection,
             "all": allSelected.toString()
         });
     }

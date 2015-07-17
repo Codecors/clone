@@ -238,6 +238,7 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('joinSession', function (data){
+        console.log('joining')
         socket.join(data.session);
     })
 
@@ -254,11 +255,13 @@ io.sockets.on('connection', function (socket) {
         });
 
     socket.on('wheel', function (data) {
-            var user = getPidForUser(socket.id) + " " + socket.id;
+            var pid = getPidForUser(socket.id);
+            var user = pid + " " + socket.id;
             var session = getSessionForUser(socket.id);
             // var user = data.pid + " " + data.guid;
             log(user + " " + data.time + " wheel: " + data.result, session);
             feedback("wheel: " + data.result, socket.id);
+            io.to(session).emit('wheelUpdate', {"pid": pid, "value": data.selection });
             // move back to dial
             // changeUserView('/dial', socket.id, null);
 

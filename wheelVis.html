@@ -8,10 +8,16 @@
 	<div width='100%'>
         <object id='wheel-svg' width='100%' type='image/svg+xml' data='./customGEW.svg'></object>
 	</div>
+    <div width='100%'>
+        <svg id='summary' width='100%' viewBox="0 0 400 400"></svg>
+	</div>
 <script>
 
     // the letters
     var letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',	'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't'];
+    // clockwise round wheel
+    var orderedLetters = ['a', 'b', 'e', 'f', 'g', 'h', 'p', 'o', 'n', 's',
+                     't', 'q', 'r', 'm', 'l', 'k', 'j', 'i', 'd', 'c'];
 
     // the labels, as map to letters above
     var labels = ['shock', 'interest', 'anger', 'hate', 'amusement',
@@ -25,6 +31,76 @@
           return decodeURIComponent(name[1]);
     }
 
+
+    // calculate a single score for each emotion
+    function sumForEmotion(){
+        var sums = [];
+        for(var i=0; i< orderedLetters.length; i++){
+            var emo = labels[letters.indexOf(orderedLetters[i])];
+            var label = orderedLetters[i];
+            var sum = 0;
+            for(var j = 1; j <= 4; j++){
+                sum += j*results['circle' + j + '-' + label];
+            }
+            console.log(emo + ": " + sum);
+            sums.push(sum);
+        }
+        return sums;
+    }
+
+
+    function buildEmptySummary(){
+        var svg = document.getElementById('summary');
+        var wheel = document.getElementById("wheel-svg");
+    	svgDoc = wheel.contentDocument;
+        var xmlns = "http://www.w3.org/2000/svg";
+        for(var i=0; i< orderedLetters.length; i++){
+            var segment = document.createElementNS(xmlns,'path');
+            segment.setAttribute('d', '');
+            segment.id = 'summary-' + i;
+            var cId = 'circle1-' + orderedLetters[i];
+            var c = svgDoc.getElementById('circle1-' + orderedLetters[i]);
+            var color = c.getAttribute('style');
+            segment.setAttribute('style', color);
+            svg.appendChild(segment);
+        }
+    }
+
+    function svgSummary(sums){
+        var cX = 200, cY = 200, theta = (2*Math.PI)/letters.length;
+        var pathStart = "M " + cX + "," + cY + " L ";
+        var pathEnd = " L " + cX + "," + cY + " Z";
+        var max = Math.max.apply(null, sums);
+        console.log(max);
+        var rScale = 200/max; // Array.max(sums);
+        console.log(rScale);
+        for(var i=0; i< orderedLetters.length; i++){
+            if(sums[i] > 0){
+            var r = rScale * sums[i];
+            var a = polarToCartesian(r, i*theta);
+            var b = polarToCartesian(r, (i+1)*theta)
+            console.log(a);
+            console.log(b);
+            var path = pathStart + (a[0]+cX) + " " + (a[1]+cY);
+            path += " A " + r + " " + r + " 0 0 1 " + (b[0]+cX) + " " + (b[1]+cY);
+            path += pathEnd;
+            // console.log(path);
+            var el = document.getElementById('summary-' + i);
+            el.setAttribute('d', path);
+            // var C = document.createElementNS(xmlns,"circle");
+            console.log(path);
+        }
+    }
+        // .appendChild(svg);
+        // console.log(svgDoc);
+    }
+
+    function polarToCartesian(R, theta){
+        var theta = theta-(Math.PI/2);
+        var x = R * Math.cos(theta);
+        var y= R * Math.sin(theta);
+        return [x,y];
+    }
 
     //  initiate results
     var results = {};
@@ -51,7 +127,8 @@
             animate(circle);
         }
         setOpacities();
-
+        var sums = sumForEmotion();
+        svgSummary(sums);
     }
 
 
@@ -101,6 +178,13 @@
         }
     });
 
+    var svgElement = document.getElementById("wheel-svg");
+    svgElement.addEventListener('load', function()
+    {
+        buildEmptySummary();
+    });
+
+    // setTimeout(buildEmptySummary, 3000);  // double check it's worked...
 
 </script>
 </body>

@@ -223,6 +223,23 @@ io.sockets.on('connection', function (socket) {
         changeUserView(data.url, socket.id, data.session);
     });
 
+
+    // a user has lost connection and rejoining on a new socket id
+    socket.on('rejoin', function (data){
+        var session = data.session;
+        socket.join(session);
+        log(data.pid + " rejoined session " + session + " as " + socket.id, session);
+        for (var i = 0; i < sessions.length; i++){
+            var sessionMembers = sessions[i].users;
+            for(var j = 0; j < sessionMembers.length; j++){
+                if(sessionMembers[j].guid ==  data.oldid){
+                    sessionMembers[j].guid = socket.id;
+                }
+            }
+        }
+        data.guid = socket.id;
+    });
+
     // request for a list of all users in a session
     socket.on('getusers', function (data){
         var session = getSessionById(data.session);
@@ -261,7 +278,7 @@ io.sockets.on('connection', function (socket) {
             // var user = data.pid + " " + data.guid;
             log(user + " " + data.time + " wheel: " + data.result, session);
             feedback("wheel: " + data.result, socket.id);
-            io.to(session).emit('wheelUpdate', {"pid": pid, "value": data.selection });
+            io.to(session).emit('wheelUpdate', {"pid": pid, "value": data.selection, "location": data.location });
             // move back to dial
             // changeUserView('/dial', socket.id, null);
 
@@ -306,8 +323,9 @@ io.sockets.on('connection', function (socket) {
     function feedback(message, guid){
         // var pid = getPidForUser(guid);
         var session = getSessionForUser(guid);
+        var originalguid = getFirstGuid(guid);
         // send to session pages - control page can display
-        io.to(session).emit('feedback', {"message": message, "user": guid});
+        io.to(session).emit('feedback', {"message": message, "user": originalguid});
     }
 
 
@@ -389,6 +407,19 @@ function getSessionById(sessionid){
     return null;
 }
 
+
+// gets the first guid for user on current socket id
+function getFirstGuid(guid){
+    for (var i = 0; i < sessions.length; i++){
+        var sessionMembers = sessions[i].users;
+        for(var j = 0; j < sessionMembers.length; j++){
+            if(sessionMembers[j].guid ==  guid){
+                return sessionMembers[j].originalguid;
+            }
+        }
+    }
+}
+
 // a session - has id and list of users
 var Session = function(nid, logfilestream){
     this.users = [];
@@ -400,5 +431,6 @@ var Session = function(nid, logfilestream){
 // a user - as a human-readable id (pid) and unique guid
 var User = function(guid, pid){
     this.pid = pid;
-    this.guid = guid;
+    this.guid = guid; // current socket id
+    this.originalguid = guid; // remember first guid given
 }

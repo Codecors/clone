@@ -367,7 +367,6 @@ function setFields(){
 
 /* submit pressed - save selection via xmlhttprequest */
 function storeWheel(){
-    updateLocation();
     // generate string
     var now = new Date();
     var resultsString = "";
@@ -380,8 +379,7 @@ function storeWheel(){
         "time": now.getTime(),
         "result": resultsString,
         "selection": selection,
-        "all": allSelected.toString(),
-        "location": position
+        "all": allSelected.toString()
     };
 
     if(nodejs){

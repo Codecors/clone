@@ -55,6 +55,8 @@ var nodejs = true;
 var position = [0,0]; // store gps location
 
 
+updateLocation();
+
 // allow the content of this page to be changed
 socket.on('static', function (data) {
     // stop any ongoing logging
@@ -73,14 +75,13 @@ socket.on('static', function (data) {
     // set title
     document.title = data.title + pid;
 
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(setLocation);
-    }
 });
 
 
-// send socket data, or cache
+// send socket data, or cache it
+// also adds postion information
 function sendSocketData(message, data){
+    data["location"] = position;
     if(connected){
         socket.emit(message, data);
     }
@@ -102,6 +103,7 @@ function start(destination){
 
 function updateLocation(){
     navigator.geolocation.getCurrentPosition(setLocation);
+    setTimeout(updateLocation, 10000);
 }
 
 function setLocation(pos) {

@@ -268,7 +268,7 @@ io.sockets.on('connection', function (socket) {
             var session = getSessionForUser(socket.id);
             log(user + " " + data.time + " dial: " + data.value, session);
             feedback("dial: " + data.value, socket.id);
-            io.to(session).emit('dialUpdate', {"pid": pid, "value": data.value });
+            io.to(session).emit('dialUpdate', {"pid": pid, "value": data.value, "location": data.location });
         });
 
     socket.on('wheel', function (data) {

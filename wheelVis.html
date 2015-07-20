@@ -9,7 +9,7 @@
         <object id='wheel-svg' width='100%' type='image/svg+xml' data='./customGEW.svg'></object>
 	</div>
     <div width='100%'>
-        <svg id='summary' width='100%' viewBox="0 0 400 400"></svg>
+        <svg id='summary' width='100%' viewBox="-200 -200 400 400"></svg>
 	</div>
 <script>
 
@@ -42,7 +42,6 @@
             for(var j = 1; j <= 4; j++){
                 sum += j*results['circle' + j + '-' + label];
             }
-            console.log(emo + ": " + sum);
             sums.push(sum);
         }
         return sums;
@@ -66,33 +65,33 @@
         }
     }
 
+
+    // draw a simple diagram showing summary of results in a way that could
+    // be displayed on a map
     function svgSummary(sums){
-        var cX = 200, cY = 200, theta = (2*Math.PI)/letters.length;
+        var cX = 0, cY = 0, theta = (2*Math.PI)/letters.length;
         var pathStart = "M " + cX + "," + cY + " L ";
         var pathEnd = " L " + cX + "," + cY + " Z";
+
         var max = Math.max.apply(null, sums);
-        console.log(max);
         var rScale = 200/max; // Array.max(sums);
-        console.log(rScale);
+
         for(var i=0; i< orderedLetters.length; i++){
             if(sums[i] > 0){
-            var r = rScale * sums[i];
-            var a = polarToCartesian(r, i*theta);
-            var b = polarToCartesian(r, (i+1)*theta)
-            console.log(a);
-            console.log(b);
-            var path = pathStart + (a[0]+cX) + " " + (a[1]+cY);
-            path += " A " + r + " " + r + " 0 0 1 " + (b[0]+cX) + " " + (b[1]+cY);
-            path += pathEnd;
-            // console.log(path);
-            var el = document.getElementById('summary-' + i);
-            el.setAttribute('d', path);
-            // var C = document.createElementNS(xmlns,"circle");
-            console.log(path);
+                var r = rScale * sums[i];
+                var a = polarToCartesian(r, i*theta);
+                var b = polarToCartesian(r, (i+1)*theta)
+
+                // create svg segment path
+                var path = pathStart + (a[0]+cX) + " " + (a[1]+cY);
+                path += " A " + r + " " + r + " 0 0 1 " + (b[0]+cX) + " " + (b[1]+cY);
+                path += pathEnd;
+
+                // set the right portion to have this segment path
+                var el = document.getElementById('summary-' + i);
+                el.setAttribute('d', path);
+            }
         }
-    }
-        // .appendChild(svg);
-        // console.log(svgDoc);
     }
 
     function polarToCartesian(R, theta){
@@ -114,7 +113,9 @@
 
 
     // new set of results in
-    function logResults(selection){
+    function logResults(data){
+        var selection = data.value;
+        console.log('gps: ' + data.location);
         for(var i = 0; i < selection.length; i++){
             var circle = selection[i];
             if(results[circle] == null){
@@ -174,7 +175,7 @@
 
     socket.on('wheelUpdate', function(data){
         if(data.pid === pid || pid == null){
-            logResults(data.value);
+            logResults(data);
         }
     });
 

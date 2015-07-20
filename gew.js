@@ -367,6 +367,7 @@ function setFields(){
 
 /* submit pressed - save selection via xmlhttprequest */
 function storeWheel(){
+    updateLocation();
     // generate string
     var now = new Date();
     var resultsString = "";
@@ -375,13 +376,16 @@ function storeWheel(){
         resultsString += textField.value + ",";
     }
 
+    var dataToServer = {
+        "time": now.getTime(),
+        "result": resultsString,
+        "selection": selection,
+        "all": allSelected.toString(),
+        "location": position
+    };
+
     if(nodejs){
-        socket.emit('wheel', {
-            "time": now.getTime(),
-            "result": resultsString,
-            "selection": selection,
-            "all": allSelected.toString()
-        });
+        sendSocketData('wheel', dataToServer);
     }
     else{
         // send data

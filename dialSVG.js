@@ -201,7 +201,7 @@ function storeDial(){
     // var median = getMedian(recents);
     var now = new Date();
     if(nodejs){
-        socket.emit('dial', { "time": now.getTime(), "value": percent});
+        sendSocketData('dial', { "time": now.getTime(), "value": percent});
     }
     else{
         console.log(percent, now);

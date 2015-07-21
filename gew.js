@@ -76,27 +76,8 @@ function addFeedbackFields(){
     instruct1.innerHTML = MAX_CHOICES;
     var instruct2 = document.getElementById("number2");
     instruct2.innerHTML = MAX_CHOICES;
-
-    // second, add feedback area fields
-    var feedbackDiv = document.getElementById("feedback");
-    for (var i = 0; i < MAX_CHOICES; i++){
-            var fbEmo = document.createElement("div");
-            fbEmo.className = 'fbline';
-            var lab = document.createTextNode("Emotion " + (i+1) + ": ");
-            fbEmo.appendChild(lab);
-            var display = document.createElement("input");
-            display.name = 'emo' + (i+1);
-            display.id = 'emotion' + (i+1);
-            display.type = 'text';
-            fbEmo.appendChild(display);
-            var colBlk = document.createElement("div");
-            colBlk.id = 'emo' + (i+1);
-            colBlk.className = 'indicator';
-            fbEmo.appendChild(colBlk);
-            feedbackDiv.appendChild(fbEmo);
-    }
-
 }
+
 
 /* add a listener to each circle in the wheel, plus neutral and other */
 function addCircleListeners(){
@@ -346,20 +327,27 @@ function getNumber(circleid){
 
 /* set feedback form fields to reflect selection array */
 function setFields(){
+    var feedback = document.getElementById('feedback');
+    while(feedback.firstChild){
+        feedback.removeChild(feedback.firstChild);
+    }
     // now reset
     for (var i = 0; i < MAX_CHOICES; i++){
-        var textField = document.getElementById('emotion' + (i+1));
-        var colorBlock = document.getElementById('emo' + (i+1));
         if(selection[i]){
+            var span = document.createElement('span');
+            span.className = 'fb';
+            span.name = 'fb-'+selection[i];
             var emo = getLabel(selection[i]);
             var strength = getNumber(selection[i]);
-            textField.value = emo;
-            colorBlock.style.background = getColor(selection[i]);
-            colorBlock.style.opacity = strength/4;
-        }
-        else{
-            textField.value = "";
-            colorBlock.style.background = 'rgb(255, 255, 255)';
+            span.appendChild(document.createTextNode(emo + "/4"));
+            // span.style.background = getColor(selection[i]);
+            // span.style.color = 'rgb(100,100,100)';
+            span.style.border = "4px solid " + getColor(selection[i]);
+            feedback.appendChild(span);
+            span.onclick = function(){
+                var circle = this.name.substring(3);
+                deselect(circle);
+            };
         }
     }
 }
@@ -371,8 +359,13 @@ function storeWheel(){
     var now = new Date();
     var resultsString = "";
     for (var i = 0; i < MAX_CHOICES; i++){
-        var textField = document.getElementById('emotion' + (i+1));
-        resultsString += textField.value + ",";
+        if(selection[i]){
+            var emo = getLabel(selection[i]);
+            var strength = getNumber(selection[i]);
+            resultsString += emo + ",";
+}
+        // var textField = document.getElementById('emotion' + (i+1));
+        // resultsString += textField.value + ",";
     }
 
     var dataToServer = {

@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <script src="/socket.io/socket.io.js"></script>
+    <title>Adding a Custom Overlay</title>
+    <style>
+      #map-canvas {
+        height: 500px;
+        margin: 0;
+        padding: 0;
+      }
+
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp"></script>
+    </head>
+    <div width='100%'>
+        <object id='wheel-svg' width='100%' type='image/svg+xml' data='./customGEW.svg'></object>
+    </div>
+    <body>
+      <div id="map-canvas"></div>
+    <script>
+
+    var wheelRadius = 100;
+    var overlayOpacity = 0.7;
+
+    // the letters
+    var letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',	'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't'];
+    // clockwise round wheel
+    var orderedLetters = ['a', 'b', 'e', 'f', 'g', 'h', 'p', 'o', 'n', 's',
+                     't', 'q', 'r', 'm', 'l', 'k', 'j', 'i', 'd', 'c'];
+
+    // the labels, as map to letters above
+    var labels = ['shock', 'interest', 'anger', 'hate', 'amusement',
+    	'pride', 'joy', 'contentment', 'contempt', 'disgust', 'fear',
+    	'confusion', 'disappointment', 'relief', 'admiration', 'love',
+    	'guilt', 'regret', 'compassion', 'sadness'];
+
+    var colors = []; // the colours of the wheel, taken from the svg document
+
+    var results = {}; // array to hold results
+
+    var overlays = {};
+
+    // retrieve a GET parameter
+    function get(name){
+       if(name=(new RegExp('[?&]'+encodeURIComponent(name)+'=([^&]*)')).exec(location.search))
+          return decodeURIComponent(name[1]);
+    }
+
+
+    // set up results array and grab colours
+    function setup(){
+        // grab colours then hide wheel
+        getColours();
+        document.getElementById("wheel-svg").style.display = 'none';
+    }
+
+
+    // grab the colours of the emotions from the svg doc
+    function getColours(){
+        var wheel = document.getElementById("wheel-svg");
+    	svgDoc = wheel.contentDocument;
+        for(var i=0; i< orderedLetters.length; i++){
+            var c = svgDoc.getElementById('circle1-' + orderedLetters[i]);
+            var color = c.getAttribute('style');
+            colors.push(color);
+        }
+    }
+
+
+    // calculate a single score for each emotion
+    function sumForEmotion(sid){
+        var sums = [];
+        for(var i=0; i< orderedLetters.length; i++){
+            var emo = labels[letters.indexOf(orderedLetters[i])];
+            var label = orderedLetters[i];
+            var sum = 0;
+            for(var j = 1; j <= 4; j++){
+                var resultsId = 'circle' + j + '-' + label + '-' + sid;
+                if(results[resultsId] != null){
+                    sum += j*results[resultsId];
+                }
+            }
+            sums.push(sum);
+        }
+        return sums;
+    }
+
+
+    // create an SVG diagram to summarise wheel content
+    // currently empty
+    function buildEmptySummary(sid){
+        var svg = document.createElement('svg');
+        svg.id = 'summary';
+        svg.setAttribute('width', "100%");
+        svg.setAttribute('viewBox', "-200 -200 400 400");
+        // svg.setAttribute('style', "width:100%;height:100%;position:absolute;");
+        var xmlns = "http://www.w3.org/2000/svg";
+        for(var i=0; i< orderedLetters.length; i++){
+            var segment = document.createElementNS(xmlns,'path');
+            segment.setAttribute('d', '');
+            segment.id = 'summary-' + sid + '-' + i;
+            var cId = 'circle1-' + orderedLetters[i];
+
+            segment.setAttribute('style', colors[i] + ";fill-opacity: " + overlayOpacity + ";");
+            svg.appendChild(segment);
+
+        }
+        return svg;
+    }
+
+
+    // update the svg diagram to display the results passed to this function
+    function svgSummary(sums, sid){
+        var cX = 0, cY = 0, theta = (2*Math.PI)/letters.length;
+        var pathStart = "M " + cX + "," + cY + " L ";
+        var pathEnd = " L " + cX + "," + cY + " Z";
+
+        var max = Math.max.apply(null, sums);
+        var rScale = wheelRadius/max; // Array.max(sums);
+
+        for(var i=0; i< orderedLetters.length; i++){
+            if(sums[i] > 0){
+                var r = rScale * sums[i];
+                var a = polarToCartesian(r, i*theta);
+                var b = polarToCartesian(r, (i+1)*theta)
+
+                // create svg segment path
+                var path = pathStart + (a[0]+cX) + " " + (a[1]+cY);
+                path += " A " + r + " " + r + " 0 0 1 " + (b[0]+cX) + " " + (b[1]+cY);
+                path += pathEnd;
+
+                // set the right portion to have this segment path
+                var el = document.getElementById('summary-' + sid + '-' + i);
+                el.setAttribute('d', path);
+            }
+        }
+    }
+
+
+    // convert polar to cartesian coordinates
+    function polarToCartesian(R, theta){
+        var theta = theta-(Math.PI/2);
+        var x = R * Math.cos(theta);
+        var y= R * Math.sin(theta);
+        return [x,y];
+    }
+
+
+    // new set of results in
+    function logResults(data, sid){
+
+        if(overlays[sid] == null){
+            // create overlay
+            var offset = Math.random()/100;
+            createOverlay(sid, (data.location[0]+ offset), (data.location[1]+offset));
+        }
+
+        var selection = data.value;
+        for(var i = 0; i < selection.length; i++){
+            var circle = selection[i] + '-' + sid;
+            if(results[circle] == null){
+                results[circle] = 1;
+            }
+            else{
+                results[circle] += 1;
+            }
+            // animate(circle);
+        }
+        // setOpacities();
+        var sums = sumForEmotion(sid);
+        svgSummary(sums, sid);
+    }
+
+
+    // nodejs initiation
+    var urlarr = window.location.href.split("/");
+    var server = urlarr[0] + "//" + urlarr[2]
+    var socket = io.connect(server);
+    console.log('connected');
+    var nodejs = true;
+    var session = get('s');
+    var pid = get('p');
+    socket.emit('joinSession', {"session": session });
+
+    socket.on('wheelUpdate', function(data){
+        if(data.pid === pid || pid == null){
+            logResults(data, data.pid);
+        }
+    });
+
+    var svgElement = document.getElementById("wheel-svg");
+    svgElement.addEventListener('load', function()
+    {
+        // buildEmptySummary();
+    });
+
+    // setTimeout(buildEmptySummary, 3000);  // double check it's worked...
+
+// [START region_initialization]
+// This example creates a custom overlay called SVGOverlay, containing
+// a U.S. Geological Survey (USGS) image of the relevant area on the map.
+
+// Set the custom overlay object's prototype to a new instance
+// of OverlayView. In effect, this will subclass the overlay class.
+// Note that we set the prototype to an instance, rather than the
+// parent class itself, because we do not wish to modify the parent class.
+
+
+// overlay;
+SVGOverlay.prototype = new google.maps.OverlayView();
+
+// default map
+var mapOptions = {
+    center: new google.maps.LatLng(53.472778, -2.297222),
+    zoom: 14,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+};
+
+var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+// [END region_initialization]
+// create a new overlay centred on cX, cY
+function createOverlay(overlayId, cX, cY){
+    var swBound = new google.maps.LatLng(cX-0.001, cY-0.001);
+    var neBound = new google.maps.LatLng(cX+0.001, cY+0.001);
+    var bounds = new google.maps.LatLngBounds(swBound, neBound);
+    var overlay = new SVGOverlay(bounds, map, overlayId);
+}
+
+// [START region_constructor]
+/** @constructor */
+function SVGOverlay(bounds, map, oid) {
+
+  // Initialize all properties.
+  this.bounds_ = bounds;
+  // this.image_ = image;
+  this.map_ = map;
+  this.svg_ = buildEmptySummary();
+  // Define a property to hold the image's div. We'll
+  // actually create this div upon receipt of the onAdd()
+  // method so we'll leave it null for now.
+  this.div_ = null;
+
+  this.oid_ = oid;
+  overlays[oid] = this;
+
+  // Explicitly call setMap on this overlay.
+  this.setMap(map);
+}
+// [END region_constructor]
+
+// [START region_attachment]
+/**
+ * onAdd is called when the map's panes are ready and the overlay has been
+ * added to the map.
+ */
+SVGOverlay.prototype.onAdd = function() {
+
+  var div = document.createElement('div');
+  div.id='svglayer';
+  div.style.borderStyle = 'none';
+  div.style.borderWidth = '0px';
+  div.style.position = 'absolute';
+
+  // Create the img element and attach it to the div.
+  div.innerHTML = buildEmptySummary(this.oid_).outerHTML; //this.svg_);
+  // div.appendChild(buildEmptySummary()); //this.svg_);
+
+  this.div_ = div;
+
+  // Add the element to the "overlayLayer" pane.
+  var panes = this.getPanes();
+  panes.overlayLayer.appendChild(div);
+};
+// [END region_attachment]
+
+// [START region_drawing]
+SVGOverlay.prototype.draw = function() {
+
+  // We use the south-west and north-east
+  // coordinates of the overlay to peg it to the correct position and size.
+  // To do this, we need to retrieve the projection from the overlay.
+  var overlayProjection = this.getProjection();
+
+  // Retrieve the south-west and north-east coordinates of this overlay
+  // in LatLngs and convert them to pixel coordinates.
+  // We'll use these coordinates to resize the div.
+  var sw = overlayProjection.fromLatLngToDivPixel(this.bounds_.getSouthWest());
+  var ne = overlayProjection.fromLatLngToDivPixel(this.bounds_.getNorthEast());
+
+  // Resize the image's div to fit the indicated dimensions.
+  var div = this.div_;
+  var w = (ne.x - sw.x);
+  var h = (sw.y - ne.y);
+  var actualWidth = 400;
+  var scale = actualWidth/w;
+  div.style.left = (sw.x + (w-actualWidth)/2) + 'px';
+  div.style.width = actualWidth + 'px';
+  div.style.top = (ne.y + (h-actualWidth)/2) + 'px';
+  div.style.height = actualWidth + 'px';
+
+
+};
+// [END region_drawing]
+
+// [START region_removal]
+// The onRemove() method will be called automatically from the API if
+// we ever set the overlay's map property to 'null'.
+SVGOverlay.prototype.onRemove = function() {
+  this.div_.parentNode.removeChild(this.div_);
+  this.div_ = null;
+};
+// [END region_removal]
+
+// google.maps.event.addDomListener(window, 'load', initialize);
+
+
+// when the wheel is loaded, grab the colours
+var svgElement = document.getElementById("wheel-svg");
+svgElement.addEventListener('load', function()
+{
+    setup();
+});
+
+    </script>
+  </body>
+</html>

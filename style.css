@@ -54,6 +54,12 @@
 	margin: 10px 10px 10px 0;
 }
 
+.fb{
+    padding:0.3em;
+    margin: 0.5em;
+    color: rgb(100,100,100);
+}
+
 .likert li{
     display: table-cell;
     list-style-type: none;

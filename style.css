@@ -50,14 +50,24 @@
 .feedback {
 	float: left;
 	border: 1px solid gray;
-	padding: 0 10px 10px 10px;
+	padding: 20px 10px 10px 10px;
 	margin: 10px 10px 10px 0;
+}
+
+.center{
+    text-align: center;
 }
 
 .fb{
     padding:0.3em;
     margin: 0.5em;
     color: rgb(100,100,100);
+    border-radius: 0.3em;
+}
+
+.fb a{
+    color: rgb(150,150,150);
+    text-decoration: none;
 }
 
 .likert li{

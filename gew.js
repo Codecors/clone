@@ -327,11 +327,12 @@ function getNumber(circleid){
 
 /* set feedback form fields to reflect selection array */
 function setFields(){
+    // remove current selection
     var feedback = document.getElementById('feedback');
     while(feedback.firstChild){
         feedback.removeChild(feedback.firstChild);
     }
-    // now reset
+    // now create items for current selection
     for (var i = 0; i < MAX_CHOICES; i++){
         if(selection[i]){
             var span = document.createElement('span');
@@ -339,15 +340,20 @@ function setFields(){
             span.name = 'fb-'+selection[i];
             var emo = getLabel(selection[i]);
             var strength = getNumber(selection[i]);
-            span.appendChild(document.createTextNode(emo + "/4"));
-            // span.style.background = getColor(selection[i]);
-            // span.style.color = 'rgb(100,100,100)';
-            span.style.border = "4px solid " + getColor(selection[i]);
-            feedback.appendChild(span);
-            span.onclick = function(){
+            span.appendChild(document.createTextNode(emo + "/4 "));
+
+            var remBut = document.createElement('a');
+            remBut.href = 'javacript::void();';
+        	remBut.innerHTML = '&otimes;';
+            remBut.name = 'fb-'+selection[i];
+        	remBut.addEventListener('click', function(ev){
                 var circle = this.name.substring(3);
                 deselect(circle);
-            };
+        	});
+            span.appendChild(remBut);
+
+            span.style.border = "4px solid " + getColor(selection[i]);
+            feedback.appendChild(span);
         }
     }
 }

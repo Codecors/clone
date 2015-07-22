@@ -20,10 +20,17 @@
     </div>
     <body>
       <div id="map-canvas"></div>
+      <div id='controls'>
+          <input type='range' id='scaleGraph' min='4' max='50'/>
+      </div>
     <script>
 
-    var wheelRadius = 100;
+    var wheelRadius = 200;
+    var displayLimit = 10; // once any emotion reaches this level, wheel is scaled to fit within radius
+    var updateInterval = 2000; // ms between auto graph updates
     var overlayOpacity = 0.7;
+    var timeWindow = 60; // time data remains visualised for
+    var map;
 
     // the letters
     var letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',	'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't'];
@@ -42,6 +49,8 @@
     var results = {}; // array to hold results
 
     var overlays = {};
+
+    setUp();
 
     // retrieve a GET parameter
     function get(name){
@@ -71,7 +80,7 @@
 
 
     // calculate a single score for each emotion
-    function sumForEmotion(sid){
+    function sumForEmotion(sid, endtime, windowLength){
         var sums = [];
         for(var i=0; i< orderedLetters.length; i++){
             var emo = labels[letters.indexOf(orderedLetters[i])];
@@ -80,7 +89,15 @@
             for(var j = 1; j <= 4; j++){
                 var resultsId = 'circle' + j + '-' + label + '-' + sid;
                 if(results[resultsId] != null){
-                    sum += j*results[resultsId];
+                    var timestamps = results[resultsId];
+                    for(var k = 0; k < timestamps.length; k++){
+                        var deltaT = endtime - timestamps[k];
+                        if((deltaT > 0) && (deltaT < windowLength)){
+                            var decayFactor = Math.pow((1 - (deltaT/windowLength)), 2);
+                            sum += j * decayFactor;
+                            console.log(deltaT + ' ' + decayFactor);
+                        }
+                    }
                 }
             }
             sums.push(sum);
@@ -95,7 +112,7 @@
         var svg = document.createElement('svg');
         svg.id = 'summary';
         svg.setAttribute('width', "100%");
-        svg.setAttribute('viewBox', "-200 -200 400 400");
+        svg.setAttribute('viewBox', "-500 -500 1000 1000");
         // svg.setAttribute('style', "width:100%;height:100%;position:absolute;");
         var xmlns = "http://www.w3.org/2000/svg";
         for(var i=0; i< orderedLetters.length; i++){
@@ -118,7 +135,12 @@
         var pathStart = "M " + cX + "," + cY + " L ";
         var pathEnd = " L " + cX + "," + cY + " Z";
 
+        // if maxmimum value is greater than displayLimit, then scale so always
+        // within wheelRadius
         var max = Math.max.apply(null, sums);
+        if(max < displayLimit){
+            max = displayLimit;
+        }
         var rScale = wheelRadius/max; // Array.max(sums);
 
         for(var i=0; i< orderedLetters.length; i++){
@@ -135,6 +157,10 @@
                 // set the right portion to have this segment path
                 var el = document.getElementById('summary-' + sid + '-' + i);
                 el.setAttribute('d', path);
+            }
+            else if(sums[i] == 0){
+                var el = document.getElementById('summary-' + sid + '-' + i);
+                el.setAttribute('d', '');
             }
         }
     }
@@ -162,42 +188,78 @@
         for(var i = 0; i < selection.length; i++){
             var circle = selection[i] + '-' + sid;
             if(results[circle] == null){
-                results[circle] = 1;
+                results[circle] = [data.time];
             }
             else{
-                results[circle] += 1;
+                results[circle].push(data.time);
             }
             // animate(circle);
         }
         // setOpacities();
-        var sums = sumForEmotion(sid);
+    }
+
+
+    // update graph
+    function updatePlot(sid){
+        var now = new Date();
+        var sums = sumForEmotion(sid, now.getTime(), timeWindow*1000);
         svgSummary(sums, sid);
     }
 
 
-    // nodejs initiation
-    var urlarr = window.location.href.split("/");
-    var server = urlarr[0] + "//" + urlarr[2]
-    var socket = io.connect(server);
-    console.log('connected');
-    var nodejs = true;
-    var session = get('s');
-    var pid = get('p');
-    socket.emit('joinSession', {"session": session });
-
-    socket.on('wheelUpdate', function(data){
-        if(data.pid === pid || pid == null){
-            logResults(data, data.pid);
+    // update all plots
+    function updateAll(){
+        console.log("update ");
+        for(var k in overlays){
+            try{
+                updatePlot(k);
+            }
+            catch(e){
+                console.log("couldn't update " + k);
+            }
         }
-    });
+    }
 
-    var svgElement = document.getElementById("wheel-svg");
-    svgElement.addEventListener('load', function()
-    {
-        // buildEmptySummary();
-    });
 
-    // setTimeout(buildEmptySummary, 3000);  // double check it's worked...
+    // get going
+    function setUp(){
+
+        // default map
+        var mapOptions = {
+            center: new google.maps.LatLng(53.472778, -2.297222),
+            zoom: 14,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+
+        map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+
+        var scaler = document.getElementById('scaleGraph');
+        scaler.value = wheelRadius/10;
+        scaler.addEventListener('change', function(){
+            wheelRadius = this.value*10;
+            updateAll();
+        });
+
+        // nodejs initiation
+        var urlarr = window.location.href.split("/");
+        var server = urlarr[0] + "//" + urlarr[2]
+        var socket = io.connect(server);
+        console.log('connected');
+        var nodejs = true;
+        var session = get('s');
+        var pid = get('p');
+        socket.emit('joinSession', {"session": session });
+
+        socket.on('wheelUpdate', function(data){
+            if(data.pid === pid || pid == null){
+                logResults(data, data.pid);
+                // updatePlot(data.pid);
+            }
+        });
+
+
+        setInterval(updateAll, updateInterval);
+    }
 
 // [START region_initialization]
 // This example creates a custom overlay called SVGOverlay, containing
@@ -212,14 +274,6 @@
 // overlay;
 SVGOverlay.prototype = new google.maps.OverlayView();
 
-// default map
-var mapOptions = {
-    center: new google.maps.LatLng(53.472778, -2.297222),
-    zoom: 14,
-    mapTypeId: google.maps.MapTypeId.ROADMAP
-};
-
-var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
 // [END region_initialization]
 // create a new overlay centred on cX, cY

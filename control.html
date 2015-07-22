@@ -78,7 +78,9 @@ function newUser(pid, guid){
     newUserPanel.appendChild(title);
     // controls
     var controls = document.createElement('div');
+    controls.className = 'buttons';
     controls.appendChild(getNewPageButton('wheel', '/wheel', guid));
+    controls.appendChild(getNewPageButton('fob', '/fob', guid));
     controls.appendChild(getNewPageButton('dial', '/dial', guid));
     controls.appendChild(getNewPageButton('questions', '/questions', guid));
     newUserPanel.appendChild(controls);
@@ -250,9 +252,10 @@ function go(){
     <select id='participantid'>
         <!-- options added dynamically as they register -->
     </select>
-<div>
+<div class='buttons'>
     <button class='half' onclick="setUserToPage('/wheel')">Wheel</button>
     <button class='half' onclick="setUserToPage('/dial')">Dial</button>
+    <button class='half' onclick="setUserToPage('/fob')">Fob</button>
     <button class='half' onclick="setUserToPage('/questions')">Questions</button>
 </div>
 </div>

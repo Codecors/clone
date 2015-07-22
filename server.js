@@ -268,7 +268,8 @@ io.sockets.on('connection', function (socket) {
             var session = getSessionForUser(socket.id);
             log(user + " " + data.time + " dial: " + data.value, session);
             feedback("dial: " + data.value, socket.id);
-            io.to(session).emit('dialUpdate', {"pid": pid, "value": data.value, "location": data.location });
+            data.pid = pid;
+            io.to(session).emit('dialUpdate', data);
         });
 
     socket.on('wheel', function (data) {
@@ -278,7 +279,9 @@ io.sockets.on('connection', function (socket) {
             // var user = data.pid + " " + data.guid;
             log(user + " " + data.time + " wheel: " + data.result, session);
             feedback("wheel: " + data.result, socket.id);
-            io.to(session).emit('wheelUpdate', {"pid": pid, "value": data.selection, "location": data.location });
+            data.pid = pid;
+            data.value = data.selection;
+            io.to(session).emit('wheelUpdate', data);
             // move back to dial
             // changeUserView('/dial', socket.id, null);
 

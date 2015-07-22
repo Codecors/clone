@@ -104,6 +104,8 @@ var dialContent = "dialContent.html";
 var dialScripts = ['/dialSVG.js'];
 var wheelContent = "wheelContent.html";
 var wheelScripts = ['./gew.js'];
+var fobContent = "fobContent.html";
+var fobScripts = ['fob.js'];
 var questionContent = "likert.html";
 var questionScripts = ['./likert.js'];
 
@@ -287,6 +289,17 @@ io.sockets.on('connection', function (socket) {
 
         });
 
+    socket.on('fob', function (data) {
+            var pid = getPidForUser(socket.id);
+            var user = pid + " " + socket.id;
+            var session = getSessionForUser(socket.id);
+            // var user = data.pid + " " + data.guid;
+            log(user + " " + data.time + " fob", session);
+            feedback("fob", socket.id);
+            data.pid = pid;
+            io.to(session).emit('fobPress', data);
+        });
+
     socket.on('questions', function (data) {
             var user = getPidForUser(socket.id) + " " + socket.id;
             var session = getSessionForUser(socket.id);
@@ -357,6 +370,11 @@ io.sockets.on('connection', function (socket) {
             data.content = fs.readFileSync(questionContent,"utf8").toString();
             data.scripts = questionScripts;
             data.title = "Questionnaire ";
+        }
+        else if(url === '/fob'){
+            data.content = fs.readFileSync(fobContent,"utf8").toString();
+            data.scripts = fobScripts;
+            data.title = "Fob ";
         }
         if(guid === 'all'){
             // socket.to(session).broadcast.emit('static', data);

@@ -52,7 +52,7 @@ socket.on('reconnect', function(){
 });
 
 var nodejs = true;
-var position = [0,0]; // store gps location
+var positions = [[0,0,0]]; // store gps locations
 
 
 updateLocation();
@@ -81,7 +81,7 @@ socket.on('static', function (data) {
 // send socket data, or cache it
 // also adds postion information
 function sendSocketData(message, data){
-    data["location"] = position;
+    data["location"] = [positions[0][1], positions[0][2]];
     if(connected){
         socket.emit(message, data);
     }
@@ -107,6 +107,6 @@ function updateLocation(){
 }
 
 function setLocation(pos) {
-    position = [pos.coords.latitude, pos.coords.longitude];
-    console.log(position);
+    var now = new Date();
+    positions.unshift([now.getTime(), pos.coords.latitude, pos.coords.longitude]);
 }

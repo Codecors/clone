@@ -20,9 +20,7 @@ Andy Brown
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="297mm"
-   height="210mm"
-   viewBox="0 0 1052.3622 744.09448"
+   viewBox="40 0 920.3622 794.09448"
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
@@ -1343,33 +1341,32 @@ Andy Brown
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="455.50125"
+       x="460.50125"
        y="669.5249"
        id="text4923"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4925"
-         x="455.50125"
+         x="460.50125"
          y="669.5249">Neutral</tspan></text>
     <g
        id="g4959"
        transform="translate(797.76056,-7.394366)">
       <circle
-         transform="matrix(0.95141597,-0.30790852,0.30790852,0.95141597,0,0)"
          r="56.018394"
-         cy="976.22382"
-         cx="-138.29234"
+         cy="1026.22382"
+         cx="10.29234"
          id="circle-other"
          style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.27490151px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
       <text
          sodipodi:linespacing="125%"
          id="text4923-1"
-         y="981.62842"
+         y="1031.62842"
          x="129.20757"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:27.5px;line-height:125%;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          xml:space="preserve"><tspan
-           y="981.62842"
-           x="129.20757"
+           y="1035"
+           x="-25.20757"
            id="tspan4925-9"
            sodipodi:role="line">Other</tspan></text>
     </g>

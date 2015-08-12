@@ -138,6 +138,11 @@ function setUserToPage(url){
     displayFeedback(guid, 'setting to ' + url);
 }
 
+function vibrateUsers(){
+    socket.emit('vibrate', {
+        "session": session
+    });
+}
 
 function sendUserChangeMessage(url, guid){
     socket.emit('static', {
@@ -265,6 +270,12 @@ function go(){
 <div>
     <input type='text' id='eventLabel' />
     <button onclick="syncEvent()">Go</button>
+</div>
+<hr>
+
+<h2>Prompt users:</h2>
+<div>
+    <button onclick="vibrateUsers()">Vibrate</button>
 </div>
 
 <hr>

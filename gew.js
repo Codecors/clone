@@ -287,7 +287,7 @@ function getLabel(circleid){
 		var letter = getLetter(circleid);
 		var label = labels[letters.indexOf(letter)];
 		var strength = getNumber(circleid);
-		var emo = label + " " + strength;
+		var emo = label; // + " " + strength;
 	}
 	return emo;
 }
@@ -339,12 +339,12 @@ function setFields(){
             span.className = 'fb';
             span.name = 'fb-'+selection[i];
             var emo = getLabel(selection[i]);
-            var strength = getNumber(selection[i]);
-            span.appendChild(document.createTextNode(emo + "/4 "));
+            // var strength = getNumber(selection[i]);
+            span.appendChild(document.createTextNode(emo)); // + "/4 "));
 
             var remBut = document.createElement('a');
             remBut.href = 'javacript::void();';
-        	remBut.innerHTML = '&otimes;';
+        	remBut.innerHTML = ' &otimes; ';
             remBut.name = 'fb-'+selection[i];
         	remBut.addEventListener('click', function(ev){
                 var circle = this.name.substring(3);
@@ -368,7 +368,7 @@ function storeWheel(){
         if(selection[i]){
             var emo = getLabel(selection[i]);
             var strength = getNumber(selection[i]);
-            resultsString += emo + ",";
+            resultsString += emo + " " + strength + ",";
 }
         // var textField = document.getElementById('emotion' + (i+1));
         // resultsString += textField.value + ",";

@@ -51,6 +51,10 @@ socket.on('reconnect', function(){
     }
 });
 
+socket.on('vibrate', function(){
+    vibrate();
+});
+
 var nodejs = true;
 var positions = [[0,0,0]]; // store gps locations
 
@@ -109,4 +113,11 @@ function updateLocation(){
 function setLocation(pos) {
     var now = new Date();
     positions.unshift([now.getTime(), pos.coords.latitude, pos.coords.longitude]);
+}
+
+function vibrate(){
+    console.log('vibrating');
+    if (navigator.vibrate) {
+            navigator.vibrate(1000);
+    }
 }

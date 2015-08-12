@@ -259,7 +259,12 @@ io.sockets.on('connection', function (socket) {
     socket.on('joinSession', function (data){
         console.log('joining')
         socket.join(data.session);
-    })
+    });
+
+    socket.on('vibrate', function(data){
+        console.log('vibrate')
+        io.to(data.session).emit('vibrate', data);
+    });
 
     /****** results handling ******/
 

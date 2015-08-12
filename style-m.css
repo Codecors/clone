@@ -25,6 +25,10 @@ li{
     color:white;
 }
 
+.labelBig{
+    visibility: hidden;
+}
+
 .entrance span{
 	display: block;
 }
@@ -55,15 +59,32 @@ li{
 }
 
 .feedback {
+	float: left;
 	border: 1px solid gray;
 	padding: 20px 10px 10px 10px;
-	margin: 1% 1% 1% 0;
+	margin: 10px 10px 10px 0;
+}
+
+.center{
+    text-align: center;
 }
 
 .fbline{
     margin-bottom: 20px;
 
 }
+.fb{
+    padding:0.3em;
+    margin: 0.5em;
+    color: rgb(100,100,100);
+    border-radius: 0.3em;
+}
+
+.fb a{
+    color: rgb(150,150,150);
+    text-decoration: none;
+}
+
 
 input[type=text], input[type=url], input[type=email], input[type=password] {
   -webkit-appearance: none; -moz-appearance: none;

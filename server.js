@@ -263,7 +263,7 @@ io.sockets.on('connection', function (socket) {
 
     socket.on('vibrate', function(data){
         console.log('vibrate')
-        io.to(data.session).emit('vibrate', data);
+        io.to(data.target).emit('vibrate', data);
     });
 
     /****** results handling ******/

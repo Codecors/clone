@@ -79,10 +79,11 @@ function newUser(pid, guid){
     // controls
     var controls = document.createElement('div');
     controls.className = 'buttons';
-    controls.appendChild(getNewPageButton('wheel', '/wheel', guid));
-    controls.appendChild(getNewPageButton('fob', '/fob', guid));
-    controls.appendChild(getNewPageButton('dial', '/dial', guid));
-    controls.appendChild(getNewPageButton('questions', '/questions', guid));
+    controls.appendChild(getNewPageIcon('wheel', '/wheel', guid));
+    controls.appendChild(getNewPageIcon('fob', '/fob', guid));
+    controls.appendChild(getNewPageIcon('dial', '/dial', guid));
+    controls.appendChild(getNewPageIcon('questions', '/questions', guid));
+    controls.appendChild(getBuzzIcon(guid));
     newUserPanel.appendChild(controls);
     // feedback
     var panel = document.createElement('textarea');
@@ -102,6 +103,35 @@ function getNewPageButton(label, url, guid){
             // onClickLink(currentI + '');
             sendUserChangeMessage(url, guid);
             displayFeedback(guid, 'set page to ' + label);
+        }
+     })();
+     return wheelBtn;
+}
+
+// create a button for displaying to the user to a set view
+function getNewPageIcon(label, url, guid){
+    var wheelBtn = document.createElement('img');
+    wheelBtn.src = url + ".png";
+    wheelBtn.title = label;
+    wheelBtn.onclick = (function() {
+        // var currentI = i;
+        return function() {
+            // onClickLink(currentI + '');
+            sendUserChangeMessage(url, guid);
+            displayFeedback(guid, 'set page to ' + label);
+        }
+     })();
+     return wheelBtn;
+}
+
+// create a button for prompting the user by vibration
+function getBuzzIcon(guid){
+    var wheelBtn = document.createElement('img');
+    wheelBtn.src = "buzz.png";
+    wheelBtn.onclick = (function() {
+        return function() {
+            vibrate(guid);
+            displayFeedback(guid, 'buzzed');
         }
      })();
      return wheelBtn;
@@ -138,10 +168,23 @@ function setUserToPage(url){
     displayFeedback(guid, 'setting to ' + url);
 }
 
+// send a vibrate to all in session
 function vibrateUsers(){
+    vibrate(session);
+}
+
+// send a vibrate alert
+function vibrate(user){
     socket.emit('vibrate', {
-        "session": session
+        "target": user
     });
+}
+
+// send a vibrate to the selected user
+function vibrateUser(guid){
+    var user = document.getElementById('participantid');
+    var guid = user.value;
+    vibrate(guid);
 }
 
 function sendUserChangeMessage(url, guid){
@@ -252,16 +295,22 @@ function go(){
 		</div>
 	</div>
 
-<h2>Wheel/dial selector</h2>
+<h2>Action selector</h2>
 <div>
     <select id='participantid'>
         <!-- options added dynamically as they register -->
     </select>
 <div class='buttons'>
-    <button class='half' onclick="setUserToPage('/wheel')">Wheel</button>
+    <img title='wheel' alt='emotion wheel' src='wheel.png' onclick="setUserToPage('/wheel')" />
+    <img title='dial' alt='dial' src='dial.png' onclick="setUserToPage('/dial')" />
+    <img title='fob' alt='fob' src='fob.png' src='fob.png' onclick="setUserToPage('/fob')" />
+    <img title='questions' alt='question mark' src='questions.png' onclick="setUserToPage('/questions')" />
+    <img title='alert' alt='vibrating phone' src='buzz.png' onclick="vibrateUser()" />
+    <!-- button class='half' onclick="setUserToPage('/wheel')">Wheel</button>
     <button class='half' onclick="setUserToPage('/dial')">Dial</button>
     <button class='half' onclick="setUserToPage('/fob')">Fob</button>
     <button class='half' onclick="setUserToPage('/questions')">Questions</button>
+    <button class='half' onclick="vibrateUser()">Vibrate</button -->
 </div>
 </div>
 
@@ -271,12 +320,12 @@ function go(){
     <input type='text' id='eventLabel' />
     <button onclick="syncEvent()">Go</button>
 </div>
-<hr>
 
+<!-- hr>
 <h2>Prompt users:</h2>
 <div>
     <button onclick="vibrateUsers()">Vibrate</button>
-</div>
+</div -->
 
 <hr>
 <h2>End session:</h2>

@@ -118,7 +118,13 @@ select{
 }
 
 .buttons{
-    text-align: center;
+    // text-align: center;
+}
+
+.buttons img{
+    height: 2.5em;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
 }
 
 .half{

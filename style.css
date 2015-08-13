@@ -83,6 +83,12 @@
     padding-bottom: 0.5em;
 }
 
+.buttons img{
+    height: 2.5em;
+    padding-left: 0.3em;
+    padding-right: 0.3em;
+}
+
 #questionlist{
     padding: 0;
     list-style: none;

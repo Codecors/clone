@@ -3,17 +3,17 @@
 	"questions":[
 		{
 		"id": 1,
-		"question": "While I was reading the narrative, I could easily picture the events in it taking place.",
+		"question": "I found it easy to decide when to use the emotion wheel.",
 		"type": "likert"
 		},
 		{
 		"id": 2,
-		"question": "While I was reading the narrative, activity going on in the room around me was on my mind.",
+		"question": "I found using the emotion wheel distracted me from the show.",
 		"type": "likert"
 		},
 		{
 		"id": 3,
-		"question": "I wanted to learn how the narrative ended.",
+		"question": "I found the wheel an easy way to describe how I felt.",
 		"type": "likert"
 		}
 	]

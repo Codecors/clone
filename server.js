@@ -320,10 +320,10 @@ io.sockets.on('connection', function (socket) {
     // log something - takes a message and a session
     function log(message, sessionid){
         var timestamp = new Date().getTime();
-        // var logEntry = timestamp + " " + message + "\n";
-        var logEntry = message;
-        console.log("log: " + logEntry);
-        logEntry += "\n";
+        var logEntry = "serverTime:" + timestamp + " log:" + message + "\n";
+        // var logEntry = message;
+        // console.log("log: " + logEntry);
+        // logEntry += "\n";
         var session = getSessionById(sessionid);
         if(session == null){
             console.log(sessionid + " ended");
